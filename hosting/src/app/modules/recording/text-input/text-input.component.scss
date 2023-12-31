@@ -1,0 +1,71 @@
+#text-input {
+    height: inherit;
+    align-self: center;
+    display: grid;
+}
+textarea {
+    border: thick double aliceblue;
+    color:aliceblue;
+    background-color: #00000000;
+    grid-area: textbox;
+    font-size: 20px;
+}
+.translate-button {
+    grid-area: translate;
+    align-self: center;
+    justify-self: center;
+}
+.submit-button {
+    grid-area: submit;
+    align-self: center;
+    justify-self: center;
+}
+.info {
+    grid-area: info;
+}
+
+button {
+    background-color: #00000000;
+    background-image: linear-gradient(to bottom, #000000FF, #222222FF);
+    color: aliceblue;
+}
+.info {
+    color: #000000;
+    opacity: 1.0;
+}
+.alert {
+    color: #f44336;
+    opacity: 1.;
+}
+@media screen and (min-width: 600px) {
+    #text-input {
+        width: 600px;
+        gap: 8px;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows:  3fr 2fr;
+        grid-template-areas: "textbox textbox" "translate submit";
+    }
+    textarea {
+        font-size: 24px;
+    }
+}
+@media screen and (max-width: 601px) {
+    #text-input {
+        width: 300px;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows:  3fr 2fr;
+        grid-template-areas: "textbox textbox" "translate submit";
+    }
+    textarea {
+        font-size: 16px;
+    }
+    .info {
+        font-size: 12px;
+    }
+    button {
+            font-size: 12px;
+            height: 24px;
+            width: 120px;
+    }
+
+}

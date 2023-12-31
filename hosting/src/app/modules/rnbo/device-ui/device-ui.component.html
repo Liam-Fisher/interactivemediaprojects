@@ -1,0 +1,24 @@
+<div [ngClass]="'device-ui-container' + ' ' + (rnboService.deviceID|async)+'-ui-container'">
+    <h3 id="Oscillator-Header" class="ui-section-header">
+        Oscillator
+    </h3>
+    <h3 id="Vibrato-Header" class="ui-section-header">
+        Vibrato
+    </h3>
+    <h3 id="Tremolo-Header" class="ui-section-header">
+        Tremolo
+    </h3>
+    <div *ngFor="let uiElement of rnboService.elements" 
+    [id]="uiElement.name+'-ui-panel'" [title]="uiElement.name"
+    [ngClass]="'device-ui-panel'+' '+uiElement.elementType+'-ui-panel'">
+        <div 
+        [id]="uiElement.name+'-ui'"
+        [ngClass]="'device-ui-element'+' '+' '+uiElement.elementType+'-ui-element'">
+     <!--    <p 
+        [ngClass]="'ui-element-title '+uiElement.name+'-title'">
+            {{uiElement.name}}   
+        </p>   -->      
+    </div>
+    </div> 
+</div>
+

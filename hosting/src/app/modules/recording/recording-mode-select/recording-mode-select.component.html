@@ -1,0 +1,14 @@
+<div class="mode">
+    <input id="status" 
+           type="checkbox" 
+           name="status"
+           value="status"
+        (change)="changeInputMode($event)"
+           >
+    <label for="status">
+      <div class="mode-text"
+           data-unchecked="Text To Speech"
+           data-checked="Microphone">
+      </div>
+    </label>
+  </div>

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" [attr.width]="size" [attr.height]="size" (click)="handleRecordClick($event)">
+  <title>Record</title>
+  
+  <circle class="outline" 
+  cx="50%" cy="50%" r="30%" 
+  fill="none" 
+  [attr.stroke-width]="size===100 ? '2' : '1'" 
+  stroke="#e0e0e0"
+  />
+  <circle 
+  cx="50%"
+  cy="50%"
+  [attr.stroke-width]="size===100 ? '2' : '1'" 
+  [ngClass]="
+        (isRecording | async) 
+          ? 'sound-wave active' 
+          : 'sound-wave'
+        " />
+  <rect 
+  rx="100"
+  [ngClass]="
+        (isRecording | async)
+          ? 'record-button recording-button'
+          : 'record-button'
+      " />
+</svg>
+<p class="button-info">
+  {{ (isRecording | async) ? 'Recording... ' : 'Click to record' }}
+</p>

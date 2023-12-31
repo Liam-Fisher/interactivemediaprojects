@@ -1,0 +1,5 @@
+
+
+    <button *ngFor="let preset of presets" [title]="preset.name" (click)="onPresetClick(preset.name)" [ngClass]="(currentSelection|async) === preset.name ? 'selected' : 'preset-button'">
+        {{preset.emoji}}
+    </button>

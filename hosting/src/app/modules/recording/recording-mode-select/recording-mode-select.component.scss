@@ -1,0 +1,61 @@
+.mode {
+    width: 100%;
+    height: 100%;
+}
+
+.mode #status {
+    display: none;
+}
+
+.mode #status+label {
+    height: 100%;
+    width: 100%;
+}
+
+.mode #status+label>.mode-text {
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background-color: grey;
+    color: white;
+    transition: all 0.5s ease;
+    padding: 3px;
+    border-radius: 3px;
+}
+
+.mode #status+label>.mode-text::before,
+.mode #status+label>.mode-text::after {
+    border-radius: 2px;
+    height: calc(100% - 6px);
+    width: calc(50% - 3px);
+    display: flex;
+    align-items: center;
+    position: absolute;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.mode #status+label>.mode-text::before {
+    background-color: white;
+    color: black;
+    box-shadow: 0 0 4px 4px rgba(0, 0, 0, 0.2);
+    left: 3px;
+    z-index: 10;
+    content: attr(data-unchecked);
+}
+
+.mode #status+label>.mode-text::after {
+    right: 0;
+    content: attr(data-checked);
+}
+
+.mode #status:checked+label>.mode-text::after {
+    left: 0;
+    content: attr(data-unchecked);
+}
+
+.mode #status:checked+label>.mode-text::before {
+    left: 50%;
+    content: attr(data-checked);
+}

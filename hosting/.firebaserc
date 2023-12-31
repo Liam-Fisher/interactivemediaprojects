@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "interactive-media-projects": {
+      "hosting": {
+        "interactive-media-projects": [
+          "interactive-media-projects"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "interactive-media-projects"
+  }
+}

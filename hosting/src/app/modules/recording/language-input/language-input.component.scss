@@ -1,0 +1,21 @@
+button {
+    height: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background-color: #00000000;
+    background-image: linear-gradient(to bottom, #000000FF, #222222FF);
+    color: aliceblue;
+}
+@media screen and (min-width: 600px) {
+    button {
+        font-size: 24px;
+    }
+}
+@media screen and (max-width: 601px) {
+    button {
+        font-size: 12px;
+        height: 24px;
+        width: 120px;
+    }
+}

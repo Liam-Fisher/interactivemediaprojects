@@ -1,0 +1,46 @@
+
+p {
+  display: flex;
+  justify-content: center;
+  width: 150px;
+  color: hsl(163, 100%, 33%);;
+}
+.outline {
+  cx: 50;
+  cy: 50;
+  r: 30;
+  fill: none;
+  stroke: #e0e0e0;
+  stroke-width: 2;
+}
+.preload {
+  opacity: 0;
+}
+.play-triangle {
+  opacity: 1;
+  fill: hsl(163, 100%, 33%);
+}
+.play-triangle:hover {
+  opacity: 1;
+  fill: hsl(163, 75%, 66%);
+}
+
+
+
+.progress-circle {
+  --animation-duration: 0.1s;
+  cx: 50;
+  cy: 50;
+  r: 40;
+  stroke: #0074d9;
+  stroke-dasharray: 251.33;
+  stroke-dashoffset: 251.33;
+  stroke-width: 8;
+  fill: none;
+  opacity: 1;
+  transition: all var(--animation-duration) linear;
+}
+
+.progress-circle-active {
+  stroke-dashoffset: 0;
+}

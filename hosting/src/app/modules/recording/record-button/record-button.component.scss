@@ -1,0 +1,54 @@
+
+p {
+  display: flex;
+  justify-content: center;
+  width: 150px;
+  color: hsl(346, 82%, 59%);
+}
+      .record-button {
+        width: 50%;
+        height: 50%;
+        x: 25%;
+        y: 25%;
+        rx: 100;
+        fill: hsl(346, 82%, 59%); /* Your red circle color */
+        transition: all 0.25s ease-in-out;
+      }
+      .record-button:hover {
+        fill: hsl(346, 82%, 72%); /* Your red circle color */
+      } 
+      .recording-button {
+        width: 30%;
+        height: 30%;
+        x: 35%;
+        y: 35%;
+        rx: 0;
+      }
+
+      .sound-wave {
+        cx: 50%;
+        cy: 50%;
+        r: 30%;
+        fill: none;
+        stroke: #e0e0e0;
+        stroke-width: 1;
+        stroke-opacity: 1;
+      }
+
+      .active {
+        animation: soundWave 1s linear infinite;
+      }
+      @keyframes soundWave {
+        0% {
+          r: 30%;
+          stroke-width: 2;
+          stroke-opacity: 1;
+        }
+        100% {
+          r: 20%;
+          stroke-width: 0.25;
+          stroke-opacity: 0;
+        }
+
+      }
+

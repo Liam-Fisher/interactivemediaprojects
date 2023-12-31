@@ -1,0 +1,53 @@
+.preset-ui-label {
+    color:aliceblue;
+}
+button {
+    border-width: 10px;
+    color: aliceblue;
+}
+
+.preset-button {
+    background-image: linear-gradient(to bottom, #000000FF, #222222FF);
+    border-style: solid;
+    border-color: #00000000;
+}
+.selected {
+    background: radial-gradient(#222222FF 50%,  #727272 100%);
+    border-style: double;
+    border-color: #f0f8ffAA #f0f8ff #f0f8ff #f0f8ff;
+}
+
+#mobileIndicator {
+    display: none;
+}
+
+
+@media screen and (min-width: 600px) {
+    div {
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+        height: 100%;
+        flex-direction: column;
+        font-size: 48px;
+    }
+    button {
+        border-width: 10px;
+        font-size: 48px;
+    }
+}
+@media screen and (max-width: 601px) {
+    div  {
+        display: grid;
+        align-items: center;
+        justify-items: center;
+        grid-template-rows: 40px 40px;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+}   
+    button {
+        border-width: 5px;
+        height: 40px;
+        width: 60px;
+        font-size: 16px;
+    }
+}

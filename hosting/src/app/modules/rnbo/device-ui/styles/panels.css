@@ -1,0 +1,126 @@
+.device-ui-panel {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+    background-color: black;
+    color:aliceblue;
+  }
+  .ui-section-header {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-self: center;
+    align-items: center;
+    justify-content: center;
+    color:#5ef13a;
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 12px;
+    
+  }
+  .kslider-ui-panel {
+    
+    background-color: black;
+    color:aliceblue;
+    justify-content: center;
+  }
+  .dial-ui-panel {
+    justify-content: flex-start;
+  }
+  .dial-ui-panel {
+    justify-content: flex-start;
+  }
+#Oscillator-Header {
+    grid-area: OscillatorHeader;
+}
+#Vibrato-Header {
+    grid-area: VibratoHeader;
+}
+#Tremolo-Header {
+    grid-area: TremoloHeader;
+}
+#Loop-ui::before {
+    content: "🔂";
+    margin: 0px 0px 4px 0px;
+  }
+  #On-ui::before {
+    content: "⏯";
+    margin: 0px 0px 4px 0px;
+  }
+  #Warp-ui::before {
+    content: "🔀";
+    margin: 0px 0px 4px 0px;
+  }
+  #Direction-ui::before {
+    content: "⏮";
+    margin: 0px 0px 4px 0px;
+  }
+  #Loop-ui-panel {
+    grid-area: Loop;
+  }
+  #On-ui-panel {
+    grid-area: On;
+  }
+  #Warp-ui-panel {
+    grid-area: Warp;
+  }
+  #Direction-ui-panel {
+    grid-area: Direction;
+  }
+  #OscillatorNote-ui-panel {
+    grid-area: OscillatorNote;
+  }
+  #OscillatorOctave-ui-panel {
+    grid-area: OscillatorOctave;
+  }
+  #OscillatorWaveform-ui-panel {
+    grid-area: OscillatorWaveform;
+  }
+  #Blur-ui-panel {
+    grid-area: Blur;
+  }
+  #VibratoNote-ui-panel {
+    grid-area: VibratoNote;
+  }
+  #VibratoOctave-ui-panel {
+    grid-area: VibratoOctave;
+  }
+  #VibratoWaveform-ui-panel {
+    grid-area: VibratoWaveform;
+  }
+  #VibratoDepth-ui-panel {
+    grid-area: VibratoDepth;
+  }
+  #TremoloNote-ui-panel {
+    grid-area: TremoloNote;
+  }
+  #TremoloOctave-ui-panel {
+    grid-area: TremoloOctave;
+  }
+  #TremoloWaveform-ui-panel {
+    grid-area: TremoloWaveform;
+  }
+  #TremoloDepth-ui-panel {
+    grid-area: TremoloDepth;
+  }
+.toggle-ui-panel {
+  justify-content: center;
+}
+  @media screen and (min-width: 600px) {
+  .toggle-ui-panel {
+    margin: 10px;
+    font-size: 32px;
+  }.ui-section-header {
+    font-size: 24px;
+       }
+    }
+    @media screen and (max-width: 601px) {
+       .ui-section-header {
+    font-size: 16px;
+       }
+  .toggle-ui-panel {
+    font-size: 24px;
+  }
+  
+    }
