@@ -1,12 +1,12 @@
 import { Component, ElementRef, NgZone, OnInit, ViewChild } from '@angular/core';
 import { ThreeService } from 'src/app/services/three/three.service';
-import { FaceData, FaceName, IRubix, IRubixParams, IRubixState } from 'src/app/types/rubix';
-import { IThree } from 'src/app/types/threejs';
+import { FaceData, FaceName, IRubix, IRubixParams } from 'src/app/types/rubix';
 import * as rubixEvents from './helpers/init/listeners';
 import { createCube } from './helpers/init/createCube';
 import { rotate } from './helpers/rotation/main';
 import { animateRotation } from './helpers/rotation/animate';
-import { RubixCubeState } from './logic/rubix';
+import { CubeletState } from './logic/cubeletState';
+import { FaceletState } from './logic/faceletState';
 
 @Component({
   selector: 'app-rubix',
@@ -17,7 +17,7 @@ import { RubixCubeState } from './logic/rubix';
   ></app-rubix-rotation-input>`,
   styles: ['div {width: 500px; height: 500px; }']
 })
-export class RubixComponent implements OnInit, IRubix<RubixCubeState> {
+export class RubixComponent implements OnInit, IRubix<CubeletState, FaceletState> {
   // THREE.js scene
   scene!: THREE.Scene;
   camera!: THREE.PerspectiveCamera;
@@ -36,8 +36,8 @@ export class RubixComponent implements OnInit, IRubix<RubixCubeState> {
     cubeletSize: 0.75,
     colorPalette: [ 0xFFFFFF, 0xFFFF00,  0xFFA500, 0xFF0000, 0x00FF00, 0x0000FF, 0x000000 ]
   }
-  
-  state = new RubixCubeState();
+  cubeletState = new CubeletState();
+  faceletState = new FaceletState();
   cubeletAddresses: number[] = [];
   faceColors!: FaceData;
   cubeOrientation!: Map<number, FaceName>;
@@ -77,17 +77,6 @@ export class RubixComponent implements OnInit, IRubix<RubixCubeState> {
     let [perspective, direction, slice] = event;
     console.log(`rotating with perspective: ${perspective},  direction: ${direction}, slice: ${slice}`);
     rotate.call(this);
-  }
-  printFaces(){
-    console.log(`... ... ... ... ... ... ... `);
-    for(let face in this.faceColors) {
-      let colors= this.faceColors[face as FaceName];
-      console.log(`${face}:           `);
-      console.log(`${colors[0]}|${colors[1]}|${colors[2]}`);
-      console.log(`${colors[3]}|${colors[4]}|${colors[5]}`);
-      console.log(`${colors[6]}|${colors[7]}|${colors[8]}`);
-    }
-    console.log(`... ... ... ... ... ... ... `);
   }
   ngOnInit(): void {
     

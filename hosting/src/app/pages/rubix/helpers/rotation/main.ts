@@ -1,37 +1,53 @@
-import { Axis3dName, FaceName } from "src/app/types/rubix";
+import { Axis, Orientation } from "src/app/types/rubix";
 import { getRotation } from "./rotationAction";
 import * as THREE from 'three';
-import { getCubeletAddresses, getFaceAddresses, getFaceletAddresses } from "./addresses";
 
 
 export function rotate() {
-    let { orientation, axis3d, face,  axis2d, slice } = getRotation.call(this);
-    console.log(`orientation: ${orientation}, axis3d: ${axis3d}, face: ${face}, axis2d: ${axis2d}, slice: ${slice}`);
-    if (!axis3d || orientation === undefined) {
+    let { orientation, axis,  slice } = getRotation.call(this);
+    console.log(`orientation: ${orientation}, axis: ${axis} slice: ${slice}`);
+    if (!axis || !orientation) {
         return;
     }
-    console.log(`rotating from face: ${face} on axis ${axis3d} with orientation: ${orientation}`);
-    let faces = getFaceAddresses(axis3d, orientation);
-    let cubelets = getCubeletAddresses(axis3d, slice);
-    let facelets = getFaceletAddresses(axis2d, slice);
-    console.log(`face rotation order: ${faces.join('=>')}`);
-    console.log(`cubelets addresses: ${cubelets.join('|')}`);
-    console.log(`facelet addresses: ${facelets.join('|')}`);
-    if (!slice || !face || !axis2d) {
+    
+    this.rotationVector = new THREE.Vector3(+(axis==='x'), +(axis==='y'), +(axis==='z'));
+    this.rotationAngle = Math.PI / (this.rotationFrames * (orientation === '+' ? 2 : -2));
+    let cubeletNames: string[] = [];
+    if (!slice) {
         console.log('rotating whole cube');
-        rotateFaceColors.call(this, faces, facelets);
+        rotateCube.call(this, cubeletNames, axis, orientation);
     }
     else {
-        console.log(`rotating slice: ${slice} ${axis2d}`);
-        rotateFaceColors.call(this, faces, facelets);
+        this.faceletState.rotate(axis, orientation, slice);
+
+        cubeletNames.push(...this.cubeletState.rotate(axis, orientation, slice));
     }
-    setRotationVector.call(this, axis3d);
-    setRotationAngle.call(this, orientation);
-    setRotationGroup.call(this, cubelets);
+    setRotationGroup.call(this, cubeletNames);
     this.isRotating = true;
     return;
 }
+function rotateCube(cubeletNames: string[], axis: Axis, orientation: Orientation) {
+    for(let i=-1; i<=1; i++) {
+        this.faceletState.rotate(axis, orientation, i);
+        cubeletNames.push(...this.cubeletState.rotate(axis, orientation, i));
+        if(i===0) { // ignore the fixed cube, it should always be the middle one
+           cubeletNames.shift();
+        }
+    } // add it back here
+    setRotationGroup.call(this, ['middle', ...cubeletNames]);
+}
 
+function setRotationGroup(rotatingNames: string[]) {
+    console.log(`rotating names: ${rotatingNames.join('|')}`);
+    if(this.rotationGroup) {
+        this.rotationGroup.children.forEach((child: any) => this.scene.add(child));
+    }
+    this.rotationGroup = new THREE.Group();
+    for(let name of rotatingNames) {
+        this.rotationGroup.add(this.scene.getObjectByName(name));
+    }
+}
+/* 
 function rotateFaceColors(faces: FaceName[], facelets: number[]) {
     console.log(`initial face colors`);
     this.printFaces();
@@ -46,18 +62,4 @@ function rotateFaceColors(faces: FaceName[], facelets: number[]) {
     console.log(`new face colors`);
     this.printFaces();
     return;
-}
-function setRotationVector(axis3d: Axis3dName) {
-    this.rotationVector = new THREE.Vector3(+(axis3d === 'x'),+(axis3d === 'y'),+(axis3d === 'z'));
-}
-
-function setRotationAngle(orientation: boolean) {
-    let orientationFactor = orientation ? 4 : -4;
-    this.rotationAngle = Math.PI / (this.rotationFrames * orientationFactor);
-}
-
-function setRotationGroup(addresses: number[]) {
-    this.rotationGroup = new THREE.Group();
-    addresses.forEach((addr: number) => this.rotationGroup.add(this.scene.children[addr]));
-    this.scene.add(this.rotationGroup);
-}
+} */

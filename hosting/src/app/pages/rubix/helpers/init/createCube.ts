@@ -1,44 +1,39 @@
 import { CubeletName, Face, FaceName, IRubix, Position } from "src/app/types/rubix";
 import { addressToPosition, positionToColors, positionToName } from "../converting";
 import * as THREE from 'three';
+import { CubeletState } from "../../logic/cubeletState";
+import { FaceletState } from "../../logic/faceletState";
 
 
 export function createCube() {
-    createCubelets.call(this);
+    this.cubeletState = new CubeletState();
+    this.faceletState = new FaceletState();
+    
+    
     createShell.call(this);
-    createFaces.call(this);
+    createCubelets.call(this);
 }
 function createShell(){
     let shellSize = this.params.cubeletSize * 3.1;
     let geometry = new THREE.BoxGeometry( shellSize, shellSize, shellSize );
     let material = new THREE.MeshBasicMaterial( {color: 0xFA00FA, transparent: true, opacity: 0.25} );
     let cube = new THREE.Mesh( geometry, material );
+    cube.name = 'shell';
     this.scene.add( cube );
 }
-function createFaces() {
-    this.faceColors = {};
-    this.cubeOrientation = new Map();
-    for(let i = 0; i < 6; i++) {
-        console.log(`creating face ${i}`);
-        let name = Face[i] as FaceName;
-        this.cubeOrientation.set(i, name);
-        this.faceColors[name] = (new Array(9)).fill(i);
-        console.log(`face ${name} has colors ${this.faceColors[name].join('|')}`);
-    }
-}
+
 function createCubelets() {
     console.log('creating cubelets');
     for(let i = 0; i < 27; i++) {
-        console.log(`creating cubelet ${i}`);
-        createCubelet.call(this, i);
+        console.log(`creating cubelet ${i} with name ${this.cubeletState.cubelets[i]}`);
+        createCubelet.call(this, i, this.cubeletState.cubelets[i]);
     }
     // adjust the cube so that the front and right faces are visible
     this.scene.rotateOnWorldAxis(new THREE.Vector3(0,1,0), (Math.PI/4));
 }
 //declare function createMaterials(palette: string[], colors: number[]): THREE.MeshBasicMaterial[];
-function createCubelet(address: number) {
+function createCubelet(address: number, name: string) {
     const position = addressToPosition(address);
-    const name = positionToName(position);
     const colors = positionToColors(position);
     console.log(`creating cubelet (${address}): ${name})s`); 
     console.log(`${name}: [x: ${position.x}, y: ${position.y}, z: ${position.z}])`);
@@ -46,14 +41,13 @@ function createCubelet(address: number) {
     const colorsArray = Object.values(colors);
     console.log(`${name}: ${colorsArray})`);
     
-    const materials = createMaterials(this.colorPalette, Object.values(colors));
-    const geometry = createCubeGeometry(this.cubeletSize);
+    const materials = createMaterials(this.params.colorPalette, Object.values(colors));
+    const geometry = createCubeGeometry(this.params.cubeletSize);
     const mesh = createMesh(name, position, geometry, materials);
     this.scene.add(mesh);
-    //this.cubeData[name] = {address, position, colors};
 }
 
-function createMesh(name: CubeletName, position: Position, geometry: THREE.BoxGeometry, materials: THREE.MeshBasicMaterial[]): THREE.Mesh {
+function createMesh(name: string, position: Position, geometry: THREE.BoxGeometry, materials: THREE.MeshBasicMaterial[]): THREE.Mesh {
     const mesh = new THREE.Mesh(geometry, materials);
     mesh.name = name;
     mesh.translateX(position.x);

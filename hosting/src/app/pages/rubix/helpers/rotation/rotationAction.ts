@@ -1,6 +1,6 @@
-import { Axis2dName, Axis3dName, FaceName, Position, RotationAction } from "src/app/types/rubix";
-import { getFaceName, getPosition } from "../converting";
-
+import { Axis, Axis2dName, Axis3dName, FaceName, Orientation, Position, RotationAction } from "src/app/types/rubix";
+import { addressToPosition, getFaceName, getPosition } from "../converting";
+import * as THREE from 'three';
 
 export function getRotation(): RotationAction {
     let [startPosition, startFace] = getIntersectionData.call(this, this.positionAtPointerDown);
@@ -25,14 +25,26 @@ export function getRotation(): RotationAction {
 
 
 function getIntersectionData(pointer: THREE.Vector2): [Position, FaceName?] {
+    let faceName: FaceName;
+    let position: Position;
     this.raycaster.setFromCamera(pointer, this.camera);
     let objectsIntersected =  this.raycaster.intersectObjects(this.scene.children);
+    console.log(`getting objects intersected at: ${pointer.x}, ${pointer.y}}`);
+    console.log(`objects intersected: ${objectsIntersected.map((intersect: THREE.Intersection) => intersect.object.name).join('|')}`);
     if(objectsIntersected.length < 2) {
         let {x,y} = pointer;
-        return [{x, y, z: 0}];
+        return [{x,y,z:0}];
     }
-    let [shell, object] = objectsIntersected.slice(0,2);
-    return [getPosition(object), getFaceName(shell, this.cubeOrientation)];
+    let [intersectionA, intersectionB] = objectsIntersected.slice(0,2);
+    let [nameA, nameB] =  [intersectionA.object.name, intersectionB.object.name];
+    let [faceA, faceB] = [intersectionA.face.materialIndex, intersectionB.face.materialIndex];
+    
+    position = this.cubeletState.getPosition((nameA === 'shell' )?nameB:nameA);
+    faceName = this.faceletState.getFaceName((nameA === 'shell' )?faceB:faceA);
+
+    console.log(`object intersected: ${name}`);
+    console.log(`position: ${JSON.stringify(position)}`);
+    return [position, faceName];
 }
 
 
@@ -43,7 +55,50 @@ function getDeltaPosition(start: Position, end: Position): Position {
         z: end.z - start.z
     }
 }
+function getCubeRotation(startPosition: Position, endPosition: Position): RotationAction {
+    let orientation: Orientation, axis: Axis3dName;
+    let {x,y} = getDeltaPosition(startPosition, endPosition);
+    if(Math.sqrt(x*x+y*y)<0.25) {
+        console.log('the pointer events are too close to each other');
+        return {};// ignore small movements
+    }
+    if(Math.abs(y/x) > 0.25) {
+        axis = ((x > 0) === (y > 0)) ? 'z' : 'x';
+        orientation = y < 0 ? '+' : '-';
+    }
+    else {
+        axis = 'y';
+        orientation = x < 0 ? '+' : '-';
+    }
+    return { orientation, axis };
+}
 
+function getSliceRotation(start: Position, end: Position, face: FaceName): RotationAction  {
+    let orientation: Orientation, axis: Axis, axis2d: Axis2dName, slice: number;    
+    let {x,y,z} = getDeltaPosition(start, end);
+    if(x !== 0) { 
+        axis = face === 'front' ?'y':'z';
+        orientation = x < 0 ? '+':'-';
+        slice = start.x;
+    }
+    else if(y !== 0) { 
+        axis = face === 'left' ?'z':'x';
+        orientation = y < 0 ? '+':'-';
+        slice = start.y;
+    }
+    else if(z !== 0) { 
+        axis = face === 'top' ?'x':'y';
+        orientation = z < 0 ? '+':'-';
+        slice = start.z;
+    }
+    else {
+        console.log(`both pointer events are on the same cube`);
+        return {};
+    }
+    console.log('both pointer events are on different cubes');
+    return {axis, orientation, slice};
+}
+/* 
 function getSliceRotation(start: Position, end: Position, face: FaceName): RotationAction  {
     let orientation: boolean, axis3d: Axis3dName, axis2d: Axis2dName, slice: number;    
     let {x,y,z} = getDeltaPosition(start, end);
@@ -81,7 +136,7 @@ function getCubeRotation(startPosition: Position, endPosition: Position): Rotati
         [orientation, axis3d] = [(x < 0), 'y'];
     }
     return { orientation, axis3d };
-}
+} */
 // [face, 3dAxis] => 2dAxis
 
     // motion across the x axis on the front face is horizontal on the face, and means a rotation on the y axis, 

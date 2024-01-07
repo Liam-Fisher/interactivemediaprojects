@@ -67,23 +67,13 @@ export enum Column {
 export type ColumnName = keyof typeof Column;
 export type CubeletColumn<T = number> = Record<RowName, T>;   
 export type CubeletName = `${number}_${LayerName}_${RowName}_${ColumnName}`;
-
+export type Axis = 'x' | 'y' | 'z';
+export type Orientation = '+' | '-';
 // types passed as arguments
-export interface IntersectionData {
-    face?: FaceName;
-    position: Position;
-    address: number;
-}
-export interface RotationInput {
-    perspective: 'lefthand'|'righthand'|'cube';
-    direction: 'up'|'down'|'right'|'left';
-    slice: number;
-}
+
 export interface RotationAction {
-    orientation?: boolean;
-    axis3d?: Axis3dName;
-    face?: FaceName;
-    axis2d?: Axis2dName;
+    orientation?: Orientation;
+    axis?: Axis;
     slice?: number;
 }
 
@@ -109,6 +99,7 @@ export interface CubeletData {
 export type CubeData = Record<CubeletName, CubeletData>;
 export type FaceData = Record<FaceName, number[]>;
 
+
 export interface IThreeScene {
     scene: THREE.Scene;
     camera: THREE.PerspectiveCamera;
@@ -123,36 +114,41 @@ export interface IThreeDisplay {
     onWindowResize(): void;
 }
 export interface IRubixAnim {
+    
+    params: IRubixParams;
     isRotating: boolean;
     rotationFrames: number;
     rotationGroup: THREE.Group|null;
     rotationVector: THREE.Vector3;
     rotationAngle: number;
     rotationProgress: number;
-    ngZone: NgZone;
     animations: (() => void)[];
 }
-export interface IRubixEvent {
+export interface IRubixEvent extends IThreeScene, IThreeDisplay {
+    
+    ngZone: NgZone;
     isDragging: boolean;
     framesSincePointerDown: number;
     positionAtPointerDown: THREE.Vector2|null;
     positionAtPointerUp: THREE.Vector2|null;
     onPointerDown(event: PointerEvent): void;
     onPointerUp(event: PointerEvent): void;
-
 }
-export interface IRubixState {
-    faceColors: FaceData;
-    cubeletAddresses:Map<number, string>;
+export interface ICubeletState {
+    cubelets: string[]
+}
+export interface IFaceletState {
+    orientation: Map<number,FaceName>;
+    facelets: Record<string, number[]>;
 }
 export interface IRubixParams {
     zoom: number;
     cubeletSize: number;
     colorPalette: number[];
 }
-export interface IRubix<T extends IRubixState> extends IThreeScene, IThreeDisplay,IRubixAnim,IRubixEvent {
-    state: T;
-    params: IRubixParams;
+export interface IRubix<TC extends ICubeletState, TF extends IFaceletState> extends IThreeScene, IThreeDisplay,IRubixAnim,IRubixEvent {
+    cubeletState: TC;
+    faceletState: TF;
 }
 
 

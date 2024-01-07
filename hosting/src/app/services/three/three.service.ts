@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { IRubix } from 'src/app/types/rubix';
+import { IRubix, IRubixAnim, IThreeDisplay } from 'src/app/types/rubix';
 import { IThree } from 'src/app/types/threejs';
 import * as THREE from 'three';
 
@@ -12,7 +12,7 @@ export class ThreeService  {
   rotateZ: THREE.Vector3 = new THREE.Vector3(0,0,1);
   rotationCounter: number = 0;
   constructor() { }
-  createScene(component: IThree&IRubix) {
+  createScene(component: IThree&IThreeDisplay&IRubixAnim) {
     // scene, camera, renderer, raycaster
     component.scene = new THREE.Scene();
     component.raycaster = new THREE.Raycaster();
@@ -26,13 +26,13 @@ export class ThreeService  {
     // link renderer to display
     component.display.nativeElement.appendChild(component.renderer.domElement);
   }
-  getPointerSnorm(component: IThree&IRubix, event: PointerEvent): THREE.Vector2 {
+  getPointerSnorm(component: IThree&IThreeDisplay, event: PointerEvent): THREE.Vector2 {
     const { clientX, clientY } = event;
     const x = (clientX / component.displayWidth) * 2 - 1;
     const y = -(clientY / component.displayHeight) * 2 + 1;
     return new THREE.Vector2(x,y);
   }
-  resize(component: IThree&IRubix) {
+  resize(component: IThree&IThreeDisplay) {
     const container = component.display.nativeElement;
     component.displayWidth = container.clientWidth;
     component.displayHeight = container.clientHeight;
@@ -40,7 +40,7 @@ export class ThreeService  {
     component.camera.updateProjectionMatrix();
     component.renderer.setSize(component.displayWidth, component.displayHeight);
   }
-  render(component: IRubix) {
+  render(component: IRubixAnim&IThree) {
     component.ngZone.runOutsideAngular(() => {
         const animateFn = () => {
           requestAnimationFrame(animateFn);

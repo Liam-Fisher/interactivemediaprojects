@@ -9,6 +9,9 @@ Event Handlers
     - Get the names of the objects touched on pointerUp and pointerDown and the indexes of the faces touched
     - given the
 
-Cube Logic  
-    - 
 
+HELP
+
+    - cubes keep disappearing after being rotated
+    -  z position of rotated slicce incorrect on left side
+    
