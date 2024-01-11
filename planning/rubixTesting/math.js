@@ -110,19 +110,23 @@ exports.rotationCycle = rotationCycle;
 // 2  1  0
 // 5  4  3
 // 8  7  6
-// Back x -> y ^
-// 6 7 8
-// 3 4 5
-// 0 1 2
+// Left z -> y ^
+// 2  1  0
+// 5  4  3
+// 8  7  6
 // Top x -> z ^
 // 2  1  0
 // 5  4  3
 // 8  7  6
-// Right y ^ z ->  
+// Back x -> y ^
 // 6 7 8
 // 3 4 5
 // 0 1 2
-// Back
+// Bottom
+// 6 7 8
+// 3 4 5
+// 0 1 2
+// Right y ^ z ->  
 // 6 7 8
 // 3 4 5
 // 0 1 2

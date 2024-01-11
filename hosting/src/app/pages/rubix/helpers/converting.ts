@@ -1,5 +1,5 @@
-import { Colors, Column, ColumnName, CubeletName, FaceName, Layer, LayerName, Position, Row, RowName } from 'src/app/types/rubix';
-
+import { Colors, FaceName, Position } from 'src/app/types/rubix';
+import * as THREE from 'three';
 
 export function positionToColors(position: Position): Colors {
     const { x, y, z } = position;
@@ -25,20 +25,7 @@ export function addressToPosition(address: number): Position {
         z: Math.floor(iaddr / 9) - 1
     };
 }
-export function positionToName(position: Position): CubeletName {
-    const { x, y, z } = position;
-    const layer = Layer[z+1] as LayerName;
-    const row = Row[y+1] as RowName;
-    const column = Column[x+1] as ColumnName;
-    return `${positionToAddress(position)}_${layer}_${row}_${column}`;
-}
-export function nameToPosition(name: CubeletName): Position {
-    const [layer, row, column] = name.split('_');
-    const z = Layer[layer as LayerName]-1;
-    const y = Row[row as RowName]-1;
-    const x = Column[column as ColumnName]-1;
-    return { x, y, z };
-}
+
 // from intersection
 export function getPosition(intersection: THREE.Intersection): Position {
     let position = intersection.object.position;

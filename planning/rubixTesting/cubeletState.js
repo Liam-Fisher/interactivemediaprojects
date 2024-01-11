@@ -9,30 +9,76 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// cubelets are addressed by their position in the cube, from right to left, top to bottom, back to front
-var math_1 = require("./math");
-var RubixCubeletState = /** @class */ (function () {
-    function RubixCubeletState(size) {
+exports.CubeletState = void 0;
+var cubeletAddressObject = {
+    corner: {
+        x: {
+            '+': [0, 2, 8, 6],
+            '-': [0, 6, 8, 2]
+        },
+        y: {
+            '+': [0, 6, 18, 12],
+            '-': [0, 12, 18, 6]
+        },
+        z: {
+            '+': [0, 18, 20, 2],
+            '-': [0, 2, 20, 18]
+        }
+    },
+    edge: {
+        x: {
+            '+': [2, 8, 14, 12],
+            '-': [2, 12, 14, 8]
+        },
+        y: {
+            '+': [6, 8, 20, 18],
+            '-': [6, 18, 20, 8]
+        },
+        z: {
+            '+': [8, 14, 20, 12],
+            '-': [8, 12, 20, 14]
+        }
+    },
+    center: {
+        x: {
+            '+': [12, 14, 20, 18],
+            '-': [12, 18, 20, 14]
+        },
+        y: {
+            '+': [2, 8, 14, 12],
+            '-': [2, 12, 14, 8]
+        },
+        z: {
+            '+': [6, 8, 20, 18],
+            '-': [6, 18, 20, 8]
+        }
+    }
+};
+var CubeletState = /** @class */ (function () {
+    function CubeletState(size) {
         this.size = 3;
         this.axis = ['x', 'y', 'z'];
         this.cubelets = [];
         this.size = size !== null && size !== void 0 ? size : this.size;
         this.reset();
     }
-    RubixCubeletState.prototype.reset = function () {
+    CubeletState.prototype.reset = function () {
         this.cubelets = [
-            "corner_B", "edge_I", "corner_A",
-            "edge_K", "center_U", "edge_J",
-            "corner_D", "edge_L", "corner_C",
-            "edge_N", "center_V", "edge_M",
-            "center_X", "middle", "center_W",
-            "edge_P", "center_Y", "edge_O",
-            "corner_F", "edge_Q", "corner_E",
-            "edge_S", "center_Z", "edge_R",
-            "corner_H", "edge_T", "corner_G"
+            "corner_A", "edge_I", "corner_B",
+            "edge_J", "center_U", "edge_K",
+            "corner_C", "edge_L", "corner_D",
+            "edge_M", "center_V", "edge_N",
+            "center_W", "middle", "center_X",
+            "edge_O", "center_Y", "edge_P",
+            "corner_E", "edge_Q", "corner_F",
+            "edge_R", "center_Z", "edge_S",
+            "corner_G", "edge_T", "corner_H"
         ];
     };
-    RubixCubeletState.prototype.printCubelets = function () {
+    CubeletState.prototype.rotationCycle = function (s, o, g1, g2) {
+        return [s, s + (o === '+' ? g1 : g2), s + g1 + g2, s + (o === '+' ? g2 : g1)];
+    };
+    CubeletState.prototype.printCubelets = function () {
         console.log("... ... ... printing cubelets ... ... ... ... ");
         for (var i = 0; i < Math.pow(this.size, 2); i++) {
             var layer = Math.floor(i / this.size);
@@ -43,38 +89,59 @@ var RubixCubeletState = /** @class */ (function () {
         }
         console.log("... ... ... ... ... ... ... ... ... ... ... ... ");
     };
-    RubixCubeletState.prototype.getScaling = function (axis) {
+    CubeletState.prototype.getScaling = function (axis) {
         return [axis === 'z' ? 3 : 9, axis === 'x' ? 3 : 1];
     };
-    RubixCubeletState.prototype.getOffset = function (axis, slice) {
+    CubeletState.prototype.getOffset = function (axis, slice) {
         return (slice + 1) * (axis === 'z' ? 9 : axis === 'y' ? 3 : 1);
     };
-    RubixCubeletState.prototype.getCubeletAddresses = function (orientation, offset, s) {
+    CubeletState.prototype.getAddressFromName = function (name) {
+        return this.cubelets.indexOf(name);
+    };
+    CubeletState.prototype.getCubeletAddresses = function (orientation, offset, s) {
         // different sizes would require splitting the cubelets into rings 
-        var diagonal = (0, math_1.rotationCycle)(offset, orientation, s[0] * 2, s[1] * 2);
-        var orthogonal = (0, math_1.rotationCycle)(offset + s[1], orientation, (s[0] - s[1]), (s[0] + s[1]));
+        var diagonal = this.rotationCycle(offset, orientation, s[0] * 2, s[1] * 2);
+        var orthogonal = this.rotationCycle(offset + s[1], orientation, (s[0] - s[1]), (s[0] + s[1]));
         var fixed = s[0] + s[1] + offset; // for z 4, 13, 22 | for y 10, 13, 16 | for x 12, 13, 14
         return [diagonal, orthogonal, fixed];
     };
-    RubixCubeletState.prototype.rotate = function (axis3d, orientation, slice) {
-        var scale = this.getScaling(axis3d);
-        var offset = this.getOffset(axis3d, slice);
+    CubeletState.prototype.rotate = function (axis, orientation, slice) {
+        var scale = this.getScaling(axis);
+        var offset = this.getOffset(axis, slice);
         console.log("scale: ".concat(scale));
         var _a = this.getCubeletAddresses(orientation, offset, scale), diagonal = _a[0], orthogonal = _a[1], fixed = _a[2];
         console.log("diagonal addresses: ".concat(diagonal));
         console.log("orthogonal addresses: ".concat(orthogonal));
         console.log("fixed address: ".concat(fixed));
-        var cubeletNames = [];
-        (0, math_1.permute)(this.cubelets, cubeletNames, [diagonal, orthogonal]);
-        return __spreadArray([this.cubelets[fixed]], cubeletNames, true);
+        return __spreadArray([this.cubelets[fixed]], this.permute([diagonal, orthogonal]), true);
     };
-    return RubixCubeletState;
+    CubeletState.prototype.permute = function (cycles) {
+        var rotatedCubelets = [];
+        for (var i = 0; i < cycles.length; i++) {
+            var cycle = cycles[i].reverse();
+            var temp = this.cubelets[cycle[0]];
+            for (var j = 0; j < cycle.length - 1; j++) {
+                console.log("swapping ".concat(cycle[j], " with ").concat(cycle[j + 1]));
+                var newName = this.cubelets[cycle[j + 1]];
+                this.cubelets[cycle[j]] = newName;
+                rotatedCubelets.push(newName);
+            }
+            this.cubelets[cycle[cycle.length - 1]] = temp;
+            rotatedCubelets.push(temp);
+        }
+        return rotatedCubelets;
+    };
+    return CubeletState;
 }());
-var state = new RubixCubeletState();
+exports.CubeletState = CubeletState;
+var state = new CubeletState();
 state.printCubelets();
 var testRotations = [
-    { orientation: '+', axis3d: 'z', slice: -1 }
+    { orientation: '+', axis3d: 'y', slice: 1 },
+    { orientation: '+', axis3d: 'z', slice: -1 },
+    { orientation: '+', axis3d: 'x', slice: 1 }
 ];
+// rotated F|D|C|B instead of F|G|H|B
 for (var test = 0; test < testRotations.length; test++) {
     var testRotation = testRotations[test];
     var orientation_1 = testRotation.orientation, axis3d = testRotation.axis3d, slice = testRotation.slice;

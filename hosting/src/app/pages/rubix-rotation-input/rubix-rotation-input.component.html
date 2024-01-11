@@ -2,23 +2,23 @@
 <button (click)="cubeRotationAction.emit('flip')">Flip</button>
 <button (click)="cubeRotationAction.emit('turn')">Turn</button>  
 <form (ngSubmit)="onSubmit()">
-    <label for="selectedDirection">Select Perspective:</label>
-<select id="face" name="perspective" [(ngModel)]="perspective" (change)="onPerspectiveChange($event)" required>
-    <option *ngFor="let option of rotationOptions.perspective" [value]="option">{{option}}</option>
+    <label for="selectedAxis">Select Perspective:</label>
+<select id="selectedAxis" name="selectedAxis" [(ngModel)]="axis" required>
+    <option *ngFor="let option of rotationOptions.axis" [value]="option">{{option}}</option>
 </select>
 
 <br>
 
-<label for="selectedDirection">Select Direction:</label>
-<select id="selectedDirection" name="selectedDirection" [(ngModel)]="direction" (change)="onDirectionChange($event)" required>
-<option *ngFor="let option of rotationOptions.direction" [value]="option">{{option}}</option>
+<label for="selectedOrientation">Select Orientation:</label>
+<select id="selectedOrientation" name="selectedOrientation" [(ngModel)]="orientation"  required>
+<option *ngFor="let option of rotationOptions.orientation" [value]="option">{{option}}</option>
 </select>
 
 <br>
 
-<label for="selectSlice">Select Slice:</label>
-<select id="selectSlice" name="selectSlice" [(ngModel)]="slice" (change)="onSliceChange($event)" required>
-<option *ngFor="let option of (sliceOptions|async)" [value]="option">{{option}}</option>   
+<label for="selectedSlice">Select Slice:</label>
+<select id="selectedSlice" name="selectedSlice" [(ngModel)]="slice" required>
+<option *ngFor="let option of rotationOptions.slice" [value]="option">{{option}}</option>   
 </select>
 
 <br>

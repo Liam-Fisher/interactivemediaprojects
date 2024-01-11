@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-rubix-rotation-input',
@@ -9,43 +8,19 @@ import { BehaviorSubject } from 'rxjs';
 export class RubixRotationInputComponent {
 
   rotationOptions = {
-    "perspective": ["left", "right"],
-    "direction": ["down", "up", "left", "right"],
-    "verticalSlice": ["far", "middle", "near"],
-    "horizontalSlice": ["top", "center", "bottom"]
+    "axis": ["x", "y", "z"],
+    "orientation": ["+", "-"],
+    "slice": ["-1", "0", "1"]
   }
-  perspective = "left";
-  direction = "down";
-  slice = "far";
-  sliceOptions = new BehaviorSubject<string[]>(['left', 'down', 'far']);
+  axis = "x";
+  orientation = "+";
+  slice = "0";
   
   @Output() cubeRotationAction: EventEmitter<string> = new EventEmitter();
-  @Output() sliceRotationAction: EventEmitter<[string, string, string]> = new EventEmitter();
+  @Output() sliceRotationAction: EventEmitter<[string, string, number]> = new EventEmitter();
   constructor() { }
-  onPerspectiveChange(event: any) {
-    this.perspective = event.target.value;
-    console.log(`selected perspective: ${this.perspective}`);
-  }
-  onDirectionChange(event: any) {
-    this.direction = event.target.value;
-    console.log(`selected direction: ${this.direction}`);  
-    this.sliceOptions.next(this.setSliceOptions());
-  
-  }
-  onSliceChange(event: any) {
-    this.slice = event.target.value;
-    console.log(`selected slice: ${this.slice}`);
-  }
-  setSliceOptions(): string[] {
-      if(this.direction === "up" || this.direction === "down") {
-        return this.rotationOptions.verticalSlice;
-      }
-      else {
-        return this.rotationOptions.horizontalSlice;
-      }
-    }
   onSubmit() {
-    this.sliceRotationAction.emit([this.perspective, this.direction, this.slice]);
+    this.sliceRotationAction.emit([this.axis, this.orientation, +this.slice]);
   }
 
 }

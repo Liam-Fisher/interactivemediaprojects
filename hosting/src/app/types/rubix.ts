@@ -1,5 +1,7 @@
 import { ElementRef, NgZone } from '@angular/core';
 import * as THREE from 'three';
+import { CubeletState } from '../pages/rubix/logic/cubeletState';
+import { FaceletState } from '../pages/rubix/logic/faceletState';
 
 export enum Face {
     'front',
@@ -11,63 +13,10 @@ export enum Face {
 }
 export type FaceName = keyof typeof Face;
 export type Colors<T = number> = Record<FaceName, T>;
-// export type Cube<T = string> = Record<FaceName, T>;
-
-export enum Rotation {
-    'up',
-    'down',
-    'right',
-    'left'
-}
-export type RotationName = keyof typeof Rotation;
-export enum Slope {
-    'SW',
-    'SE',
-    'NW',
-    'NE'
-}
-export type SlopeName = keyof typeof Slope;
-export enum Axis3d {
-    'x',
-    'y',
-    'z'
-}
-export type Axis3dName = keyof typeof Axis3d;
 
 
-export type Position<T = number> = Record<Axis3dName, T>;
-
-export enum Axis2d {
-    'horizontal',
-    'vertical'
-}
-export type Axis2dName = keyof typeof Axis2d;
-
-
-export enum Layer {
-    'back',
-    'inner',
-    'front'
-}
-export type LayerName = keyof typeof Layer;
-export type CubeletLayer<T = number> = Record<LayerName, T>;   
-export enum Row {
-    
-    'bottom',
-    'middle',
-    'top'
-}
-export type RowName = keyof typeof Row;
-export type CubeletRow<T = number> = Record<RowName, T>;   
-export enum Column {
-    'left',
-    'center',
-    'right'
-}
-export type ColumnName = keyof typeof Column;
-export type CubeletColumn<T = number> = Record<RowName, T>;   
-export type CubeletName = `${number}_${LayerName}_${RowName}_${ColumnName}`;
 export type Axis = 'x' | 'y' | 'z';
+export type Position<T = number> = Record<Axis, T>;
 export type Orientation = '+' | '-';
 // types passed as arguments
 
@@ -76,15 +25,11 @@ export interface RotationAction {
     axis?: Axis;
     slice?: number;
 }
-
-export interface RotationParameters {
-    slice: number;
-}
-export interface CubeletAddressMap {
+export interface PermutationAddressMap  {
     // the addresses of the cubelets to rotate
-    corners: number[],
-    edges: number[],
-    center: number;
+    diagonal: number[],
+    orthogonal: number[],
+    fixed: number;
 }
 // Cube State
 export interface CubeletData {
@@ -96,59 +41,65 @@ export interface CubeletData {
     // the faces of a cubelet, in order of front, back, right, left, top, bottom
     colors: Colors;
 }
-export type CubeData = Record<CubeletName, CubeletData>;
-export type FaceData = Record<FaceName, number[]>;
 
 
-export interface IThreeScene {
+export interface IRubixDisplay {
     scene: THREE.Scene;
     camera: THREE.PerspectiveCamera;
     renderer: THREE.WebGLRenderer;
     raycaster: THREE.Raycaster;
-
-}
-export interface IThreeDisplay {
     display: ElementRef<HTMLDivElement>;
     displayHeight: number;
     displayWidth: number;
-    onWindowResize(): void;
 }
-export interface IRubixAnim {
-    
-    params: IRubixParams;
+
+export interface IRubixRotation {
+    queue: RotationAction[];
     isRotating: boolean;
-    rotationFrames: number;
-    rotationGroup: THREE.Group|null;
-    rotationVector: THREE.Vector3;
-    rotationAngle: number;
-    rotationProgress: number;
-    animations: (() => void)[];
+    names: string[]
+    group: THREE.Group;
+    vector: THREE.Vector3;
+    angle: number;
+    progress: number;
+    frames: number;
 }
-export interface IRubixEvent extends IThreeScene, IThreeDisplay {
-    
-    ngZone: NgZone;
-    isDragging: boolean;
-    framesSincePointerDown: number;
-    positionAtPointerDown: THREE.Vector2|null;
-    positionAtPointerUp: THREE.Vector2|null;
-    onPointerDown(event: PointerEvent): void;
-    onPointerUp(event: PointerEvent): void;
+
+export interface IRubixPointer {
+    isDown: boolean;
+    framesDown: number;
+    downPosition: THREE.Vector2;
+    upPosition: THREE.Vector2;
 }
-export interface ICubeletState {
-    cubelets: string[]
-}
-export interface IFaceletState {
-    orientation: Map<number,FaceName>;
-    facelets: Record<string, number[]>;
-}
-export interface IRubixParams {
-    zoom: number;
+
+export interface IRubixGraphics {
     cubeletSize: number;
     colorPalette: number[];
 }
-export interface IRubix<TC extends ICubeletState, TF extends IFaceletState> extends IThreeScene, IThreeDisplay,IRubixAnim,IRubixEvent {
-    cubeletState: TC;
-    faceletState: TF;
+export interface IRubixGame {
+    isActive: boolean;
+    isScrambling: boolean;
+    scrambleCount: number;
+    moveCount: number;
 }
+
+export interface IRubix extends IRubixDisplay{
+    ngZone: NgZone;
+    
+    gameState: IRubixGame;
+    graphicsState: IRubixGraphics;
+
+    rotationState: IRubixRotation;
+    pointerState: IRubixPointer;
+
+    cubeletState: CubeletState;
+    faceletState: FaceletState;
+
+    onPointerDown: (event: PointerEvent) => void;
+    onPointerUp: (event: PointerEvent) => void;
+    onWindowResize: () => void;
+    
+}
+
+
 
 
