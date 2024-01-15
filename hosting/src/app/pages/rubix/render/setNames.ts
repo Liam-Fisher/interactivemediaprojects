@@ -1,11 +1,7 @@
 import { Axis, IRubix, Orientation } from 'src/app/types/rubix';
 
-export function setRotationNames(component: IRubix, axis: Axis, orientation: Orientation, slice?: number): void {
-  if (typeof slice === 'number') {
+export function setRotationNames(component: IRubix, axis: Axis, orientation: Orientation, slice: number): void {
     component.rotationState.names = rotateSlice(component,  axis, orientation, slice);
-    } else {
-      component.rotationState.names = rotateCube(component, axis, orientation);
-    }
 }
 
 export function rotateSlice(component: IRubix, axis: Axis, orientation: Orientation, slice: number) {

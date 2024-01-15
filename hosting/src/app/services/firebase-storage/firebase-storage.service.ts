@@ -1,7 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import {environment} from '../../../environments/environment';
-import { Storage, ref,  uploadBytes, listAll,getDownloadURL, getBlob, getBytes, UploadTask, UploadResult } from '@angular/fire/storage';
+import { Storage, ref,  uploadBytes, listAll,getDownloadURL, getBlob, getBytes, UploadResult } from '@angular/fire/storage';
+
+// basically a wrapper for @angular/fire/storage, but with the bucket already set and the folder structure already defined
 
 @Injectable({
   providedIn: 'root'
@@ -9,16 +11,10 @@ import { Storage, ref,  uploadBytes, listAll,getDownloadURL, getBlob, getBytes, 
 export class FirebaseStorageService {
   readonly storage: Required<Storage> = inject(Storage);
   readonly bucket: string = environment.firebase.storageBucket; 
-  public uploading: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  public uploadProgress: BehaviorSubject<number> = new BehaviorSubject(-1);
-  public uploadTask!: UploadTask;
-  public storageChanged: boolean = true; 
-  public storageNames: string[] = [];
   constructor() { }
 // Firebase Cloud Storage
 async listStorageNames(path: string): Promise<string[]> {
   const  results = await listAll(ref(this.storage, path));
-  //console.log(`results: ${results.items}`);
   return results.items.map((ref) => ref.name.split('.')[0]);
 }
 getRef(path: string) {
@@ -35,16 +31,22 @@ async loadJSON(path: string) {
   return JSON.parse(await (await this.loadBlob(`${path}.json`)).text());
 }
 async loadPatcher(folder: string, id: string) {
-  return this.loadJSON(`rnbo_devices/${folder}/${id}.export`);
+  return this.loadJSON(`rnbo_patchers/${folder}/${id}.export`);
 }
 async loadAudio(audioCtx: AudioContext, path: string): Promise<AudioBuffer> {
-  //console.log(`audio from path ${path}`)
   let bytes = await getBytes(ref(this.storage, path));
   return audioCtx.decodeAudioData(bytes);
 }
 uploadFile(file: File, path: string): Promise<UploadResult> {
   const storageRef = ref(this.storage, path);
   return uploadBytes(storageRef, file);
+  }
+async createFile(blob: Blob, filename: string, filetype: string): Promise<File> {
+    let ext = filetype.split('/')[1];
+    let file = new File([blob], `${filename}.${ext}`, {
+      type: filetype,
+    });
+    return file;
   }
 
 

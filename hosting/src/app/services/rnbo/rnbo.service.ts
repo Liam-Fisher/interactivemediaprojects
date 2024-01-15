@@ -18,6 +18,13 @@ import { initializeInportUIs, initializeParameterUIs } from './helpers/ui';
 import { emit_sync_event } from './helpers/eventEmitters';
 import ParamPianoUI from './inputs/inport_elements/kslider';
 import { RadioGroupUI } from './inputs/parameter_elements/radiogroup';
+
+// split into multiple services, as some of these functions are not needed for all devices
+  // device loading Inputs (device) // should track device ids / devices and patcher ids
+  // ui creation and linking // should link parameters/inports to the outputs/inputs of specific components
+   
+
+
 /* type Metadata = {meta: Record<string, string>};
 type Parameter = RNBO.IParameterDescription & Metadata;
 type MessageInport =  Metadata & {

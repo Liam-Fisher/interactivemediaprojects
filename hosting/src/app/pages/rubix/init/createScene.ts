@@ -11,11 +11,10 @@ export function createScene(component: IRubix){
 }
 function createRenderer(component: IRubix) {
     const div = component.display.nativeElement;
-    component.renderer = new THREE.WebGLRenderer();
+    component.renderer = new THREE.WebGLRenderer({antialias: true});
     div.appendChild(component.renderer.domElement);
 }
 function createCamera(component: IRubix) {
     component.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-    component.camera.position.set(-3,2,3);    
-    component.camera.lookAt(0, 0, 0);
+
 }

@@ -16,11 +16,18 @@ export function animateRotation(component: IRubix) {
   // first, we need to know if there is a rotation in progress
   if(state.isRotating) {
     state.progress++;
+    if(state.isCameraRotating) {
+      component.scene.getObjectByName('cameraSphere')?.rotateOnWorldAxis(state.vector, state.angle);
+    }
+    else {
     //console.log(`rotation frame ${state.progress} of ${state.frames}`);
-    state.group.rotateOnWorldAxis(state.vector, state.angle);
+      state.group.rotateOnWorldAxis(state.vector, state.angle);
+    }
     if(state.progress >= state.frames) {
       console.log(`rotation complete`);
-      removeGroup(component.scene, state);
+      if(!state.isCameraRotating) {
+        removeGroup(component.scene, state);
+      }
       state.isRotating = false;
       state.progress = 0;
     }
@@ -33,17 +40,24 @@ export function animateRotation(component: IRubix) {
       
       // this should always be true
       if(axis && orientation) { 
+
+        setAngle(state, orientation);
+        setVector(state, axis);
+        if(slice !== undefined) {
         console.log(`dequeing rotation | axis: ${axis}  orientation: ${orientation} slice: ${slice}`);
         // set up the rotation
         //component.cubeletState.printCubelets();
         setRotationNames(component, axis, orientation, slice);
         //component.cubeletState.printCubelets();
         //logRotationGroup(state.names);
-        setAngle(state, orientation);
-        setVector(state, axis);
         createGroup(component.scene, state);
         console.log(`axis: ${JSON.stringify(state.vector)} angle: ${state.angle}`);
-        state.isRotating = true; 
+        state.isCameraRotating = false;
+        }
+        else {
+          state.isCameraRotating = true;
+        } 
+        state.isRotating = true;
       }
       else {
         throw new Error(`invalid rotation action: ${JSON.stringify(rotation)}`);

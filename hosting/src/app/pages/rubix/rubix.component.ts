@@ -11,10 +11,11 @@ import { scrambleActions } from './init/scramble';
   selector: 'app-rubix',
   template: `<div #rubixdisplay></div>
     <app-rubix-rotation-input
-      (sliceRotationAction)="performRotation($event)"
-      (cubeRotationAction)="rotateCube($event)"
-    ></app-rubix-rotation-input>`,
-  styles: ['div {width: 500px; height: 500px; }'],
+      (rotationActionEvent)="performRotation($event)"
+    ></app-rubix-rotation-input>
+    
+    `,
+  styles: ['div {width: 400px; height: 400px; }'],
 })
 export class RubixComponent implements OnInit, IRubix {
   // THREE.js scene
@@ -46,7 +47,7 @@ export class RubixComponent implements OnInit, IRubix {
   scrambleCube() { 
     this.rotationState.queue.push(...scrambleActions(this.gameState.scrambleCount));
   }
-  performRotation(event: [string, string, number]) {
+  performRotation(event: [string, string, number|undefined]) {
     let [axis, orientation, slice] = event;
     console.log(`enqueueing rotation | axis: ${axis}  orientation: ${orientation} slice: ${slice}`);
     this.rotationState.queue.push({ axis, orientation, slice } as RotationAction);

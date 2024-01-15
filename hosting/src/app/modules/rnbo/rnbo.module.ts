@@ -1,25 +1,34 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RnboDeviceComponent } from './rnbo-device/rnbo-device.component';
-import { EffectSelectUiComponent } from './effect-select-ui/effect-select-ui.component';
-import { DeviceUiComponent } from './device-ui/device-ui.component';
-import { PresetSelectComponent } from './preset-select/preset-select.component';
+import { RnboParameterSliderComponent } from './rnbo-parameter-slider/rnbo-parameter-slider.component';
 
-
+import { MatFormFieldModule} from '@angular/material/form-field';
+import { MatInputModule} from '@angular/material/input';
+import { MatSliderModule} from '@angular/material/slider';
+import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatSelectModule } from '@angular/material/select';
+import {MatButtonModule} from '@angular/material/button';
+import { RnboGlobalInputComponent } from './rnbo-global-input/rnbo-global-input.component';
 
 @NgModule({
   declarations: [
     RnboDeviceComponent,
-    EffectSelectUiComponent,
-    DeviceUiComponent,
-    PresetSelectComponent
+    RnboParameterSliderComponent,
+    RnboGlobalInputComponent
   ],
   imports: [
-    CommonModule
-  ],
+    CommonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSliderModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatSelectModule
+],
   exports: [
-    RnboDeviceComponent,
-    
+    RnboDeviceComponent
   ]
 })
 export class RnboModule { }

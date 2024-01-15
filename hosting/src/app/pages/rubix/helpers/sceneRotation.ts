@@ -1,3 +1,5 @@
+import { Axis, Orientation } from "src/app/types/rubix";
+
 export function rotateScene(event: string, scene: THREE.Scene) {
     if(event === 'flip') {
         scene.rotateY(Math.PI/4);

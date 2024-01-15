@@ -11,16 +11,18 @@ export function setDefaultState(component: IRubix) {
 function defaultGameState(): IRubix["gameState"] {
     let isActive = true;
     let isScrambling = true;
-    let scrambleCount = 64;
+    let scrambleCount = 24;
     let moveCount = 0;
     return {isActive, isScrambling, scrambleCount, moveCount};
 }
 
 
 function defaultGraphicsState(): IRubix["graphicsState"] {
+    let lights: THREE.PointLight[] = [];
+    let cameraDistance = 2.5;
     let cubeletSize = 0.75;
     let colorPalette = [ 0xFFFFFF, 0xFFFF00,  0xFFA500, 0xFF0000, 0x00FF00, 0x0000FF, 0x000000 ];
-    return {cubeletSize, colorPalette};
+    return { lights, cameraDistance, cubeletSize, colorPalette};
 }
 
 
@@ -41,6 +43,7 @@ function defaultRotationState(): IRubix["rotationState"] {
     let angle = 0;
     let progress = 0;
     let isRotating = false;
-    let frames = 20;
-    return {queue, names, group, vector, angle, progress, isRotating, frames};
+    let isCameraRotating = false;
+    let frames = 10;
+    return {queue, names, group, vector, angle, progress, isRotating,isCameraRotating, frames};
 }

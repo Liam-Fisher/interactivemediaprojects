@@ -56,6 +56,7 @@ export interface IRubixDisplay {
 export interface IRubixRotation {
     queue: RotationAction[];
     isRotating: boolean;
+    isCameraRotating: boolean;
     names: string[]
     group: THREE.Group;
     vector: THREE.Vector3;
@@ -72,6 +73,8 @@ export interface IRubixPointer {
 }
 
 export interface IRubixGraphics {
+    lights: THREE.PointLight[];
+    cameraDistance: number;
     cubeletSize: number;
     colorPalette: number[];
 }

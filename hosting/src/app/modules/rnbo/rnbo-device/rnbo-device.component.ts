@@ -1,34 +1,29 @@
+import { Component, Input } from '@angular/core';
+import { RnboLoaderService } from 'src/app/services/rnbo/loader/rnbo-loader.service';
+import * as RNBO from '@rnbo/js';
+export interface IDeviceComponent {
+  device_folder: string;
+  device_id: string;
+  device_name: string;
+  device: RNBO.BaseDevice|null;
 
-import { ChangeDetectorRef, Component } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { RnboService } from 'src/app/services/rnbo/rnbo.service';
-import { TextToSpeechService } from 'src/app/services/text-to-speech.service';
-import { AudioService } from 'src/app/services/webAudio/audio.service';
-
-type DeviceOptions = 'none'|'robot'|'alien';
+}
 @Component({
   selector: 'app-rnbo-device',
-  templateUrl: './rnbo-device.component.html',
-  styleUrls: ['./rnbo-device.component.css']
+  template: `
+      <div class="rnbo-device__title">{{device_id}}
+        <span>{{(loader.isLoaded|async) ? "loaded":"not loaded"}}</span>
+    </div>
+      `,
+  styleUrls: ['./rnbo-device.component.scss']
 })
-export class RnboDeviceComponent {
-  //createUIElements = false;
-  //style!: any;
-  
-  constructor(
-      public rnboService: RnboService,
-      public cdRef: ChangeDetectorRef,
-      public audioService: AudioService      
-      ) {
-   }
-  ngOnInit() {
-    this.audioService.isRecordingBufferLoaded.subscribe((isLoaded: boolean) => {
-      //console.log( `loading device: ${isLoaded}` );
-      if(isLoaded) {
-        this.rnboService.loadDevice({id: 'voiceFX_presets', folder: 'voice-fx'}).then(() => {
-          this.cdRef.detectChanges();
-        });
-      }
-    });
+export class RnboDeviceComponent implements IDeviceComponent {
+  @Input() device_folder!: string;
+  @Input() device_id!: string;
+  @Input() device_name!: string;
+  device: RNBO.BaseDevice|null = null;
+  constructor(public loader: RnboLoaderService) { }
+  ngAfterViewInit() {
+    this.loader.loadIntoComponent(this);
   }
 }
