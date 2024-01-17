@@ -1,37 +1,72 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import * as RNBO from '@rnbo/js';
+import { RnboParametersService } from '../parameters/rnbo-parameters.service';
+import { IRnboService } from '../helpers';
+type cmd = 'get' | 'set' | null;
+type Preset = {
+  target: RNBO.IPreset;
+  // get will call device.getPreset() and set the current value of the stored preset to the values of the device
+  subject: BehaviorSubject<cmd>;
+  subscriptions: Subscription[];
+  meta: any;
+};
+
 @Injectable({
   providedIn: 'root',
 })
-export class RnboPresetService {
-  presets = new Map<string, RNBO.IPreset>();
-  presetNames = new BehaviorSubject<string[]>([]);
-  constructor() {
-    this.reset();
+export class RnboPresetService extends IRnboService<
+  RNBO.IPreset,
+  cmd,
+  any
+> {
+  isLoading = new BehaviorSubject<[string, string]|null>(null);
+  selectedPresets = new Map<string, string>();
+  map = new Map<string, Map<string, Preset>>();
+  constructor(public parameterHub: RnboParametersService) {
+    super();
   }
-  reset() {
-    this.presets.clear();
-    this.presetNames.next([]);
-  }
-  async loadPreset(patcher: RNBO.IPatcher) {
-
-    let presetNames = [];
-    this.presets.clear();
-
+  async addDevice(
+    device_id: string,
+    device: RNBO.BaseDevice,
+    patcher: RNBO.IPatcher
+  ) {
+    this.map.clear();
     if (patcher.presets) {
-      for (let {name, preset} of patcher.presets) {
-        presetNames.push(name);
-        this.presets.set(name, preset);
+      let presetMetas = (patcher.desc.meta as any)?.presets ?? null;
+      for (let i = 0; i < patcher.presets.length; i++) {
+        const { name, preset } = patcher.presets[i];
+        const meta = presetMetas?.[name] ?? null;
+        
+        let obj = this.createObject(device_id, name, preset, meta, null);
+        this.setObj(device_id, name, obj);
+
+        let subscriber = (v: cmd) => {
+          this.isLoading.next([device_id, name]);
+          this.changePreset(device_id, device, name, v, preset).then(() => {
+            this.isLoading.next(null)
+          });
+        };
+        this.subscribe(obj, subscriber);
       }
-      this.presetNames.next(presetNames);
     }
   }
-  async updatePreset(device: RNBO.BaseDevice, preset_id: string) {
-    let activePreset = this.presets.get(preset_id);
-    if(activePreset) {
-      device.setPreset(activePreset);
+  async changePreset(device_id: string, device: RNBO.BaseDevice, key: string, value: cmd, preset: RNBO.IPreset) {  
+    if(value&&preset)  {
+      this.selectedPresets.set(device_id, key);
+      if(value==='get') {
+        this.setProp(device_id, key, 'target', await device.getPreset());
+      }
+    else {
+      device.setPreset(preset);
     }
-    return activePreset;
+    for(let key in preset) {
+      let value = (preset[key] as any)?.value;
+      let param = this.parameterHub.getProp(device_id, key, 'target');
+      if(value&&param&&param?.value!==value) {
+        param.value = value;
+      }
+    }
+  }
   }
 }

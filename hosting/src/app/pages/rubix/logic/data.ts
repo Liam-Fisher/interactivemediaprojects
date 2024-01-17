@@ -1,6 +1,18 @@
-import { Axis, PermutationAddressMap } from "src/app/types/rubix";
+import { Axis, FaceName, PermutationAddressMap } from "src/app/types/rubix";
 
-export const cubeletNames = [
+export const RING_FACES: Record<Axis, FaceName[]> = {
+    "x": ['front', 'bottom', 'back', 'top'],
+    "y": ['left', 'front', 'right', 'back'],
+    "z": ['top', 'right', 'bottom', 'left']
+}
+export const SIDE_FACES: Record<Axis,[FaceName,undefined,FaceName]> = {
+    "x": ['left', undefined, 'right'],
+    "y": ['top', undefined, 'bottom'],
+    "z": ['front', undefined, 'back']
+}
+
+
+export const CUBELET_NAMES = [
     "corner_A", "edge_I",   "corner_B", 
     "edge_J",   "center_U", "edge_K",
     "corner_C", "edge_L",   "corner_D",
@@ -13,7 +25,7 @@ export const cubeletNames = [
     "edge_R",   "center_Z", "edge_S",
     "corner_G", "edge_T",   "corner_H"
   ];
-export const faceNames = [
+export const FACE_NAMES:FaceName[] = [
     'front',
     'back',
     'top',
@@ -22,7 +34,7 @@ export const faceNames = [
     'right'
 ];
 // ordered by rotation cycle,
-export const faceletAddressObject: Record<string, Record<'x' | 'y' | 'z', number[][]>> = {
+export const FACELET_ROTATION_GROUPS: Record<string, Record<'x' | 'y' | 'z', number[][]>> = {
     "front": {
         "y": [[0, 1, 2], [3, 4, 5], [6, 7, 8]], "x": [[0, 3, 6], [1, 4, 7], [2, 5, 8]], "z": []
     },
@@ -42,7 +54,7 @@ export const faceletAddressObject: Record<string, Record<'x' | 'y' | 'z', number
         "z": [[6, 7, 8], [3, 4, 5], [0, 1, 2]], "x": [[2, 5, 8], [1, 4, 7], [0, 3, 6]], "y": []
     }
 }
-export const cubeletRotationAddresses: Record<Axis, PermutationAddressMap[]> = {
+export const CUBELET_ROTATION_GROUPS: Record<Axis, PermutationAddressMap[]> = {
     "x": [
         {
             "diagonal":   [0, 6,  24, 18],

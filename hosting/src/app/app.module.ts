@@ -1,3 +1,4 @@
+
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
@@ -26,6 +27,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import { RnboModule } from './modules/rnbo/rnbo.module';
+import { RubixFaceletStateComponent } from './services/rubix/rubix-facelet-state/rubix-facelet-state.component';
 
 
 @NgModule({
@@ -33,7 +35,8 @@ import { RnboModule } from './modules/rnbo/rnbo.module';
     AppComponent,
     RubixComponent,
     RubixRotationInputComponent,
-    NavigationComponent
+    NavigationComponent,
+    RubixFaceletStateComponent
   ],
   imports: [
     BrowserModule,

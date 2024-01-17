@@ -30,8 +30,7 @@ export interface ElementStyling {
     'mediumDark': [number, number, number],
     'mediumLight': [number, number, number]
 }
-export interface DialStyleParams {
-    size: [number, number];
+export type DialStyleParams = {
     interaction: 'radial'|'vertical'; // ignore horizontal
     mode: 'relative'|'absolute';
     step: number;

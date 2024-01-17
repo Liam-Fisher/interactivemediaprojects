@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RnboDeviceComponent } from './rnbo-device/rnbo-device.component';
-import { RnboParameterSliderComponent } from './rnbo-parameter-slider/rnbo-parameter-slider.component';
 
 import { MatFormFieldModule} from '@angular/material/form-field';
 import { MatInputModule} from '@angular/material/input';
@@ -11,12 +10,16 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import {MatButtonModule} from '@angular/material/button';
 import { RnboGlobalInputComponent } from './rnbo-global-input/rnbo-global-input.component';
+import { RnboMaterialParameterComponent } from './rnbo-material-parameter/rnbo-material-parameter.component';
+import { RnboInportInputComponent } from './rnbo-inport-input/rnbo-inport-input.component';
 
 @NgModule({
   declarations: [
     RnboDeviceComponent,
-    RnboParameterSliderComponent,
-    RnboGlobalInputComponent
+    RnboGlobalInputComponent,
+    RnboMaterialParameterComponent,
+    RnboInportInputComponent
+    
   ],
   imports: [
     CommonModule,
@@ -28,7 +31,7 @@ import { RnboGlobalInputComponent } from './rnbo-global-input/rnbo-global-input.
     MatSelectModule
 ],
   exports: [
-    RnboDeviceComponent
+    RnboGlobalInputComponent
   ]
 })
 export class RnboModule { }

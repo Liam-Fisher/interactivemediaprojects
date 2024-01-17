@@ -50,9 +50,7 @@ export function onPointerUp(event: PointerEvent) {
     getRotation(this);
 }
 
-export function setPointerSnorm(width: number, height: number, pointer: THREE.Vector2, event: PointerEvent) {
-const { clientX, clientY } = event;
-const x = (clientX / width) * 2 - 1;
-const y = -(clientY / height) * 2 + 1;
-pointer.set(x, y);
+export function setPointerSnorm([width, height]: [number,number], pointer: THREE.Vector2, event: PointerEvent) {
+    const { clientX, clientY } = event;
+    pointer.set((clientX / width) * 2 - 1, -(clientY / height) * 2 + 1);
 }

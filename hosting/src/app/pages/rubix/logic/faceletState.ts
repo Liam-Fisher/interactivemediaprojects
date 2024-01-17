@@ -1,16 +1,18 @@
-import { Axis, FaceName, Orientation } from "src/app/types/rubix";
-import { faceletAddressObject } from "./data";
+import { Axis, Colors, FaceName, Orientation } from "src/app/types/rubix";
+import { FACE_NAMES, FACELET_ROTATION_GROUPS } from "./data";
+import { reverseCycle } from "src/app/services/rubix/rubix-facelet-state/helper";
 
 export class FaceletState {
-    readonly faceNames: FaceName[] = ['front', 'back', 'top', 'bottom', 'left', 'right'];
-    colors!: Record<FaceName, number[]>;
+    faceNames!: FaceName[];
+    colors!: Colors<number[]>;
     orientation!: Map<number, FaceName>; // could use another array but this is more readable
     constructor() {
         this.reset();
     }
     reset() {
+        this.faceNames = Array.from(FACE_NAMES);
         this.orientation = new Map();
-        this.colors = {} as Record<FaceName, number[]>;
+        this.colors = {} as Colors<number[]>;
         for (let i=0; i<6; i++) {
             let face = this.faceNames[i];
             this.orientation.set(i, face);
@@ -37,9 +39,9 @@ export class FaceletState {
     }
     rotateSideFace(axis: Axis, orientation: Orientation, slice: number) {
         let sideFaceName = this.getSideFace(axis, slice);
-        if (sideFaceName) {
-            this.colors[sideFaceName] = this.transposeFace(this.colors[sideFaceName], orientation);
-        }
+        if (!sideFaceName) return;
+        this.colors[sideFaceName] = this.transposeFace(this.colors[sideFaceName], orientation);
+        
     }
     getSideFace(axis: Axis, slice: number): FaceName | undefined {
         if (slice === 0) return undefined;
@@ -71,6 +73,15 @@ export class FaceletState {
             }
         }
     }
+    rotateRingFaces(axis: Axis, orientation: Orientation, slice: number) {
+        let ring = this.getRingFaces(axis);
+        reverseCycle(ring, orientation);
+        console.log(`ring rotation order: ${ring.join('=>')}`);
+        // get facelet addresses with logic??
+        let facelets = ring.map(face => FACELET_ROTATION_GROUPS[face][axis][slice as number + 1]);
+        console.log( `facelet addresses: ${facelets.map(f => f.join('|')).join(' ')}`);
+        this.rotateSlice(ring, facelets);
+    }
     rotate(axis3d: 'x' | 'y' | 'z', orientation: Orientation, slice: number) {
         this.rotateSideFace(axis3d, orientation, slice);
         let ring = this.getRingFaces(axis3d);
@@ -79,7 +90,7 @@ export class FaceletState {
         }
         console.log(`ring rotation order: ${ring.join('=>')}`);
         // get facelet addresses with logic??
-        let facelets = ring.map(face => faceletAddressObject[face][axis3d][slice as number + 1]);
+        let facelets = ring.map(face => FACELET_ROTATION_GROUPS[face][axis3d][slice as number + 1]);
         console.log( `facelet addresses: ${facelets.map(f => f.join('|')).join(' ')}`);
         this.rotateSlice(ring, facelets);
     }

@@ -86,6 +86,19 @@ export class WebAudioService {
     }
     return;
   }
+  
+  createAudioBuffer(buffers: (ArrayBuffer|Float32Array)[]) {
+    let channelCount = buffers.length;
+    let length = buffers[0].byteLength/4;
+    let buffer = this._ctx.createBuffer(channelCount, this._ctx.sampleRate,length);
+    for(let i=1;i<buffers.length;i++) {
+      if(buffers[i] instanceof ArrayBuffer) {
+        buffers[i] = new Float32Array(buffers[i]);
+      }
+      buffer.copyToChannel(buffers[i] as Float32Array, i);
+    }
+    return buffer;
+  }
   // add a function/optional arg to handle "true" insertion, i.e. disconnecting a previously connected in and out
   addNode<T extends AudioNode>(id: string, node: T, connections?: ConnectionMap) {
     try {

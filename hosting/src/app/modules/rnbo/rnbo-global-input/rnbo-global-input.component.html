@@ -1,1 +1,45 @@
-<p>rnbo-global-input works!</p>
+<mat-form-field>
+  <mat-label>Device Name: {{ loaded }}</mat-label>
+  <mat-select [formControl]="idFormControl">
+    <mat-option *ngFor="let id of storedDeviceOptions | async" [value]="id">{{
+      id
+    }}</mat-option>
+  </mat-select>
+</mat-form-field>
+
+<app-rnbo-device
+  [device_id]="idFormControl.valueChanges | async"
+  (loadedEvent)="loadOptions($event)"
+></app-rnbo-device>
+
+<mat-form-field>
+  <mat-label>Parameter</mat-label>
+  <mat-select [formControl]="paramFormControl">
+    <mat-option *ngFor="let id of parameterOptions | async" [value]="id">{{
+      id
+    }}</mat-option>
+  </mat-select>
+</mat-form-field>
+
+<app-rnbo-material-parameter
+  *ngIf="paramFormControl.value !== null"
+  [device_id]="idFormControl.value"
+  [parameter_id]="paramFormControl.value"
+>
+</app-rnbo-material-parameter>
+
+<mat-form-field>
+  <mat-label>Tag</mat-label>
+  <mat-select [formControl]="tagFormControl">
+    <mat-option *ngFor="let id of tagOptions | async" [value]="id">{{
+      id
+    }}</mat-option>
+  </mat-select>
+</mat-form-field>
+
+<app-rnbo-inport-input
+  *ngIf="tagFormControl.value !== null"
+  [device_id]="idFormControl.value"
+  [tag_id]="tagFormControl.value"
+>
+</app-rnbo-inport-input>

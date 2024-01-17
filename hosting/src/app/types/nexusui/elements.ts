@@ -1,4 +1,5 @@
 import * as RNBO from '@rnbo/js';
+import { interval } from 'rxjs';
 // Meta
 
 /**
@@ -74,3 +75,93 @@ export enum InportUIElements {
   _Piano,
   _Sequencer,
 }
+
+type NexusColor = 'accent'|'fill'|'dark'|'mediumDrak'|'mediumLight';
+export type NexusUIElement<Data=any> = {
+  size: [number, number];
+  resize: (width: number, height: number) => void;
+  on: (event: string, callback: (data: Data) => void) => void;
+  destroy: () => void;
+  colorize: (theme: NexusColor, color: string) => void;
+}
+
+export type NexusToggleElement = NexusUIElement<boolean>&{
+  state: boolean;
+  flip: () => void;
+};
+type NexusPosition = {x: number, y: number};
+type NexusButtonMode = 'button'|'impulse'|'aftertouch'|'toggle';
+
+export type NexusButtonElement<Mode extends NexusButtonMode> = NexusUIElement<Mode extends 'aftertouch'?NexusPosition:boolean> &{
+  mode: Mode;
+};
+
+export type NexusSliderElement = NexusUIElement<number>&{
+  mode: 'absolute'|'relative';
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+};
+export type NexusDialElement = NexusSliderElement&{
+  interaction: 'radial'|'vertical'|'horizontal';
+};
+
+export type NexusNumberElement = NexusSliderElement&{
+  link: (target: NexusSliderElement|NexusDialElement) => void;
+};
+export type NexusMatrix = {
+  pattern: number[][];
+  toggle: {
+    cell: (column: number, row: number) => void;
+    column: (column: number) => void;
+    row: (row: number) => void;
+    all: () => void;
+  }
+  set: {
+    cell: (column: number, row: number, value: number) => void;
+    column: (column: number, values: number[]) => void;
+    row: (row: number, values: number[]) => void;
+    all: (values: number[][]) => void;
+  }
+  rotate: {
+    column: (column: number, amount?:number) => void;
+    row: (row: number, amount?:number) => void;
+    all: (amount?:number) => void;
+  }
+  populate: {
+    all: (value: number[]) => void;
+    column: (column: number, value: number[]) => void;
+    row: (row: number, value: number[]) => void;
+  }
+}
+export type NexusInterval = {
+  start: (interval?: number) => void;
+  stop: () => void;
+  ms: (interval: number) => void;
+  event: (callback: () => void) => void;
+}
+export type NexusCounter = {
+  min: number;
+  max: number;
+  mode: 'up'|'down'|'drunk'|'random';
+  value: number;
+  next: () => void;
+}
+type SequencerEventData = number[]|{
+  column: number;
+  row: number;
+  state: boolean;
+}
+export type NexusSequencerElement = NexusUIElement<SequencerEventData>&{
+columns: number;
+rows: number;
+matrix: NexusMatrix;
+stepper: NexusCounter;
+next: () => void;
+// ... using setInterval for now
+//interval: NexusInterval;
+//start: (interval?: number) => void;
+//stop: () => void;
+
+};

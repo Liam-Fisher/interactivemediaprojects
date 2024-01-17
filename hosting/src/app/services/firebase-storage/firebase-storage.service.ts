@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import {environment} from '../../../environments/environment';
 import { Storage, ref,  uploadBytes, listAll,getDownloadURL, getBlob, getBytes, UploadResult } from '@angular/fire/storage';
+import { WebAudioService } from '../audio/web-audio.service';
 
 // basically a wrapper for @angular/fire/storage, but with the bucket already set and the folder structure already defined
 
@@ -13,8 +14,14 @@ export class FirebaseStorageService {
   readonly bucket: string = environment.firebase.storageBucket; 
   constructor() { }
 // Firebase Cloud Storage
-async listStorageNames(path: string): Promise<string[]> {
+async listStorageFolders(path: string): Promise<string[]> {
   const  results = await listAll(ref(this.storage, path));
+  //console.log('results', results);
+  return results.prefixes.map((ref) => ref.name.split('.')[0]);
+}
+async listStorageFiles(path: string): Promise<string[]> {
+  const  results = await listAll(ref(this.storage, path));
+  //console.log('results', results);
   return results.items.map((ref) => ref.name.split('.')[0]);
 }
 getRef(path: string) {
@@ -33,7 +40,8 @@ async loadJSON(path: string) {
 async loadPatcher(folder: string, id: string) {
   return this.loadJSON(`rnbo_patchers/${folder}/${id}.export`);
 }
-async loadAudio(audioCtx: AudioContext, path: string): Promise<AudioBuffer> {
+async loadAudio(audioCtx: AudioContext, path: string|null): Promise<AudioBuffer|null> {
+  if(!path) return null;
   let bytes = await getBytes(ref(this.storage, path));
   return audioCtx.decodeAudioData(bytes);
 }

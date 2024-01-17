@@ -1,4 +1,4 @@
-import { IPatcher } from "@rnbo/js";
+import { IPatcher, NumberParameter, EnumParameter } from "@rnbo/js";
 import { ConnectionMap } from "../rnboTypes";
 // Data (required), Message (some required), Options (none required)
 type BufferID = string | number;
@@ -14,4 +14,11 @@ export interface DeviceLoadData {
     patcher?: IPatcher
     connections?: ConnectionMap;
     local?: boolean;
-  }
+}
+export interface IPararameterService {
+    // device Ids -> parameter Ids -> Iparameter  
+    numberParameterMap: Map<string, Map<string, NumberParameter>>;
+    enumParameterMap: Map<string, Map<string, EnumParameter>>;
+    (deviceID: string, parameterID: string): NumberParameter | EnumParameter;
+          
+}

@@ -2,6 +2,8 @@ import { ElementRef, NgZone } from '@angular/core';
 import * as THREE from 'three';
 import { CubeletState } from '../pages/rubix/logic/cubeletState';
 import { FaceletState } from '../pages/rubix/logic/faceletState';
+import { RubixCubeletStateService } from '../services/rubix/rubix-cubelet-state/rubix-cubelet-state.service';
+import { RubixFaceletStateService } from '../services/rubix/rubix-facelet-state/rubix-facelet-state.service';
 
 export enum Face {
     'front',
@@ -14,11 +16,12 @@ export enum Face {
 export type FaceName = keyof typeof Face;
 export type Colors<T = number> = Record<FaceName, T>;
 
-
 export type Axis = 'x' | 'y' | 'z';
-export type Position<T = number> = Record<Axis, T>;
+export type Position = [number, number, number];
 export type Orientation = '+' | '-';
 // types passed as arguments
+export type Swipe = 'left'|'right'|'up'|'down'|'none';
+
 
 export interface RotationAction {
     orientation?: Orientation;
@@ -29,35 +32,20 @@ export interface PermutationAddressMap  {
     // the addresses of the cubelets to rotate
     diagonal: number[],
     orthogonal: number[],
-    fixed: number;
+    fixed: number[];
 }
-// Cube State
-export interface CubeletData {
-    // a number from 0 to 26, representing the dynamic address of the cubelet
-    // this can be used to find the cubelet's position
-    address: number;
-    // the current position of the cubelet (derived from address)
-    position: Position;
-    // the faces of a cubelet, in order of front, back, right, left, top, bottom
-    colors: Colors;
-}
-
 
 export interface IRubixDisplay {
     scene: THREE.Scene;
     camera: THREE.PerspectiveCamera;
     renderer: THREE.WebGLRenderer;
     raycaster: THREE.Raycaster;
-    display: ElementRef<HTMLDivElement>;
-    displayHeight: number;
-    displayWidth: number;
 }
 
 export interface IRubixRotation {
     queue: RotationAction[];
     isRotating: boolean;
     isCameraRotating: boolean;
-    names: string[]
     group: THREE.Group;
     vector: THREE.Vector3;
     angle: number;
@@ -86,16 +74,19 @@ export interface IRubixGame {
 }
 
 export interface IRubix extends IRubixDisplay{
-    ngZone: NgZone;
     
+    ngZone: NgZone;
+
+    cubelets: RubixCubeletStateService;
+    facelets: RubixFaceletStateService;
+
+    display: ElementRef<HTMLCanvasElement>;
     gameState: IRubixGame;
     graphicsState: IRubixGraphics;
 
     rotationState: IRubixRotation;
     pointerState: IRubixPointer;
 
-    cubeletState: CubeletState;
-    faceletState: FaceletState;
 
     onPointerDown: (event: PointerEvent) => void;
     onPointerUp: (event: PointerEvent) => void;
@@ -103,6 +94,11 @@ export interface IRubix extends IRubixDisplay{
     
 }
 
+export type GameState = 'scrambling'|'solving'|'solved';
 
 
-
+export interface GameCompletionData {
+    moveCount?: number;
+    timePlayed?: number;
+    isSolved?: boolean;
+}

@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { setRotationNames } from './setNames';
 import { IRubix } from 'src/app/types/rubix';
 import { setAngle, createGroup, setVector, removeGroup } from './helpers';
-import { logRotationGroup } from '../helpers/logging';
 // the animation can be in three states:
 // 1. no rotation is in progress, and no rotations are queued
 // 2. a rotation is in progress, and no rotations are queued

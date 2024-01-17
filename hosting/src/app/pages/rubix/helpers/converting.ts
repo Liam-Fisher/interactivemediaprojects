@@ -17,13 +17,13 @@ export function positionToColors(position: Position): Colors {
 export function positionToAddress(position: Position): number {
     return 26-((position.x+1) + (position.y+1) * 3 + (position.z+1) * 9);
 }
-export function addressToPosition(address: number): Position {
+export function addressToPosition(address: number): [number, number, number] {
     let iaddr= 26-address;
-    return {
-        x: (iaddr % 3) - 1,
-        y: (Math.floor(iaddr / 3) % 3) - 1,
-        z: Math.floor(iaddr / 9) - 1
-    };
+    return [
+        (iaddr % 3) - 1, 
+        (Math.floor(iaddr / 3) % 3) - 1, 
+        Math.floor(iaddr / 9) - 1
+    ];
 }
 
 // from intersection

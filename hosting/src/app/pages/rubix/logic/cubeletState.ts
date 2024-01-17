@@ -1,7 +1,6 @@
 // cubelets are addressed by their position in the cube, from right to left, top to bottom, back to front
 import { Axis, Orientation, Position } from "src/app/types/rubix";
-import { addressToPosition } from "../helpers/converting";
-import { cubeletNames, cubeletRotationAddresses } from "./data";
+import { CUBELET_NAMES, CUBELET, CUBELET_ROTATION_GROUPS } from "./data";
 import { logCubeletState } from "../helpers/logging";
 
 
@@ -14,7 +13,7 @@ export class CubeletState {
       this.reset();
     }
     reset() {
-      this.names = Array.from(cubeletNames);
+      this.names = Array.from(CUBELET_NAMES);
     }
     printCubelets() {
       logCubeletState(this.names);
@@ -34,10 +33,7 @@ export class CubeletState {
       return this.names.indexOf(name);
     }
     rotate(axis: Axis, orientation: Orientation, slice: number): string[] {  
-      let {diagonal, orthogonal, fixed} = cubeletRotationAddresses[axis][slice+1];
-      console.log(`diagonal addresses: ${diagonal}`);
-      console.log(`orthogonal addresses: ${orthogonal}`);
-      console.log(`fixed address: ${fixed}`);
+      let {diagonal, orthogonal, fixed} = CUBELET_ROTATION_GROUPS[axis][slice+1];
       return [this.names[fixed], ...this.permute(orientation, [diagonal, orthogonal])];
     }
     permute(orientation: Orientation, cycles: number[][]): string[] {
@@ -49,12 +45,12 @@ export class CubeletState {
             }
             let temp = this.names[cycle[0]];
             for(let j = 0; j < cycle.length-1; j++) {
-              console.log(`moving ${this.names[cycle[j+1]]} to the position held by ${this.names[cycle[j]]}`);
+              //console.log(`moving ${this.names[cycle[j+1]]} to the position held by ${this.names[cycle[j]]}`);
                 let newName = this.names[cycle[j+1]];
                 this.names[cycle[j]] = newName;
                 rotatedCubelets.push(newName);
             }
-            console.log(`moving ${temp} to the position held by ${this.names[cycle[cycle.length-1]]}`);
+            //console.log(`moving ${temp} to the position held by ${this.names[cycle[cycle.length-1]]}`);
             this.names[cycle[cycle.length-1]] = temp;
             rotatedCubelets.push(temp);
         }

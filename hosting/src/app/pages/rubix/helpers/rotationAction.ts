@@ -37,10 +37,11 @@ function getIntersectionData(component: IRubix, pointer: THREE.Vector2): [Positi
     }
     let [intersectionA, intersectionB] = objectsIntersected.slice(0,2);
     let [nameA, nameB] =  [intersectionA.object.name, intersectionB.object.name];
-    let [faceA, faceB] = [intersectionA?.face?.materialIndex, intersectionB?.face?.materialIndex];
+    let [faceA, faceB] = [intersectionA?.face?.materialIndex??0, intersectionB?.face?.materialIndex??0];
     
     position = this.cubeletState.getPosition((nameA === 'shell' )?nameB:nameA);
-    faceName = this.faceletState.getFaceName((nameA === 'shell' )?faceB:faceA);
+    let faceNames: FaceName[] = this.faceletState.faceNames;
+    faceName = faceNames[((nameA === 'shell' )?faceB:faceA)]
 
     console.log(`position: ${JSON.stringify(position)}`);
     return [position, faceName];
