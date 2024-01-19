@@ -1,19 +1,48 @@
-import { Axis, Swipe, FaceName, PermutationAddressMap } from "src/app/types/rubix";
+import { Axis, Swipe, FaceName, PermutationAddressMap, Orientation, RotationAction } from "src/app/types/rubix";
 import { Face } from "three";
 //export const SWIPE_DIRECTIONS: Swipe[] = ['left', 'right', 'up', 'down', 'none'];
+
+export type CubeCode = Axis|'X'|'Y'|'Z';
 export const COLOR_PALETTE: number[] =[ 0xFFFFFF, 0xFFFF00,  0xFFA500, 0xFF0000, 0x00FF00, 0x0000FF, 0x000000 ];
-export const RING_FACES: Record<Axis, FaceName[]> = {
-    "x": ['front', 'bottom', 'back', 'top'],
-    "y": ['left', 'front', 'right', 'back'],
-    "z": ['top', 'right', 'bottom', 'left']
+/* export const RING_FACES: Record<Axis, Record<Orientation,FaceName[]>> = {
+    "x": {
+        "+": ['front', 'bottom', 'back', 'top'],
+        "-": ['front', 'top', 'back', 'bottom']
+    },
+    "y": {
+        "+": ['left', 'front', 'right', 'back'],
+        "-": ['left', 'back', 'right', 'front']
+    },
+    "z": {
+        "+": ['top', 'right', 'bottom', 'left'],
+        "-": ['top', 'left', 'bottom', 'right']
+    }
+}
+export const SIDE_FACES: Record<Axis,[FaceName,undefined,FaceName]> = {
+    "x": ['left', undefined, 'right'],
+    "y": ['top', undefined, 'bottom'],
+    "z": ['front', undefined, 'back']
+} */
+
+export const RING_FACES: Record<Axis, Record<Orientation,FaceName[]>> = {
+    "x": {
+        "+": ['front', 'bottom', 'back', 'top'],
+        "-": ['front', 'top', 'back', 'bottom']
+    },
+    "y": {
+        "+": ['left', 'front', 'right', 'back'],
+        "-": ['left', 'back', 'right', 'front']
+    },
+    "z": {
+        "+": ['top', 'right', 'bottom', 'left'],
+        "-": ['top', 'left', 'bottom', 'right']
+    }
 }
 export const SIDE_FACES: Record<Axis,[FaceName,undefined,FaceName]> = {
     "x": ['left', undefined, 'right'],
     "y": ['top', undefined, 'bottom'],
     "z": ['front', undefined, 'back']
 }
-
-
 export const CUBELET_NAMES = [
     "corner_A", "edge_I",   "corner_B", 
     "edge_J",   "center_U", "edge_K",
@@ -62,25 +91,31 @@ export const FACE_NAMES: FaceName[] = [
 const FACELET_SLICE_GROUPS: number[][] = [[0,1,2], [0, 3, 6], [3,4,5], [1, 4, 7], [6,7,8], [2, 5, 8]];
 
 
-export const FACELET_ROTATION_GROUPS: Record<Axis, number[][][]> = {
-    "x": [ // front, bottom, back, top
-        [[0,3,6],[1,4,7],[2,5,8]], // 2 4 6
-        [[2,5,8],[1,4,7],[0,3,6]],
-        [[2,5,8],[1,4,7],[0,3,6]],
-        [[0,3,6],[1,4,7],[2,5,8]]
-    ],
-    "y": [ // left, front, right, back
-        [[0,1,2],[3,4,5],[6,7,8]],
-        [[0,1,2],[3,4,5],[6,7,8]],
-        [[2,5,8],[1,4,7],[0,3,6]],
-        [[2,5,8],[1,4,7],[0,3,6]]
-    ],
-    "z": [ // top, right, bottom, left
-        [[0,1,2],[3,4,5],[6,7,8]],
-        [[2,5,8],[1,4,7],[0,3,6]],
-        [[6,7,8],[3,4,5],[0,1,2]],
-        [[2,5,8],[1,4,7],[0,3,6]]
-    ]
+export const FACELET_ROTATION_SLICES: Record<Axis, Record<FaceName, number[][]>> = {
+    "x":  {
+        "front":  [[0,3,6],[1,4,7],[2,5,8]],
+        "bottom": [[2,5,8],[1,4,7],[0,3,6]],
+        "back":   [[2,5,8],[1,4,7],[0,3,6]],
+        "top":    [[0,3,6],[1,4,7],[2,5,8]],
+        "left": [],
+        "right": []
+    },
+    "y": {
+        "left":   [[0,1,2],[3,4,5],[6,7,8]],
+        "front":  [[0,1,2],[3,4,5],[6,7,8]],
+        "right":  [[2,5,8],[1,4,7],[0,3,6]],
+        "back":   [[2,5,8],[1,4,7],[0,3,6]],
+        "top": [],
+        "bottom": []
+    },
+    "z": {
+        "top":    [[0,1,2],[3,4,5],[6,7,8]],
+        "right":  [[2,5,8],[1,4,7],[0,3,6]],
+        "bottom": [[6,7,8],[3,4,5],[0,1,2]],
+        "left":   [[2,5,8],[1,4,7],[0,3,6]],
+        "front": [],
+        "back": []
+    }
 }
 export const CUBELET_ROTATION_GROUPS: Record<Axis, number[][][]> = {
     "x": [
@@ -135,59 +170,105 @@ export const CUBELET_ROTATION_GROUPS: Record<Axis, number[][][]> = {
         
         ]
     ]
-};/* 
-export const CUBELET_ROTATION_GROUPS: Record<Axis, number[][][]> = {
-    "x": [
-        {
-            "diagonal":   [0, 6,  24, 18],
-            "orthogonal": [3, 15, 21, 9 ],
-            "fixed": [12]
-        },
-        {
-            "diagonal":   [1, 7,  25, 19],
-            "orthogonal": [4, 16, 22, 10],
-            "fixed": [13]
-        },
-        {
-            "diagonal":   [2, 8,  26, 20],
-            "orthogonal": [5, 17, 23, 11],
-            "fixed": [14]
-        }
-    ],
-    "y": [
-        {
-            "diagonal":   [0, 18, 20, 2 ],
-            "orthogonal": [1, 9,  19, 11],
-            "fixed": [10]
-        },
-        {
-            "diagonal":   [3, 21, 23, 5 ],
-            "orthogonal": [4, 12, 22, 14],
-            "fixed": [13]
-        },
-        {
-            "diagonal":   [6, 24, 26, 8],
-            "orthogonal": [7, 15, 25, 17],
-            "fixed": [16]
-        }
-    ],
-    "z": [
-        {
-            "diagonal":   [0,2,8,6],
-            "orthogonal": [1,5,7,3],
-            "fixed": [4]
-        },
-        {
-            "diagonal":   [9,  11, 17, 15],
-            "orthogonal": [10, 14, 16, 12],
-            "fixed": [13]
-        },
-        {
-            "diagonal":   [18, 20, 26, 24],
-            "orthogonal": [19, 23, 25, 21],
-            "fixed": [22]
-        }
-    ]
+};
+// only need to store the slice groups for cubelets of front, left, top
+// front 0 1 2 3 4 5 6 7 8 
+// left: 2 5 8 11 14 17 20 23 26 
+// top 0 1 2 9 10 11 18 19 20
+type t = Exclude<FaceName, 'back'>;
+export const SLICE_AXIS_ORIENTATION: Record<Exclude<Swipe,'none'>, Record<'front'|'left'|'top',[Axis, Orientation]>> = {
+    'up': {
+        'front': ['x', '-'], 
+        'left': ['z', '+'],
+        'top': ['x', '-'] 
+    },
+    "down": {
+        'front': ['x', '+'], 
+        'left': ['z', '-'], 
+        'top': ['x', '+'] 
+    },
+    "left": {
+        'front': ['y', '-'], 
+        'left': ['y', '-'], 
+        'top': ['z', '-'] 
+    },
+    "right": {
+        'front': ['y', '+'], 
+        'left': ['y', '+'], 
+        'top': ['z', '+'] 
+    }
+}
 
+export const CUBE_AXIS_ORIENTATION: Record<Exclude<Swipe,'none'>, [Axis, Orientation]> = {
+    'up': ['x', '-'],
+    'down': ['x', '+'],
+    'left': ['y', '-'],
+    'right': ['y', '+']
+}
+// "R", "r", "L", "l", "M", "m", "U", "u", "E", "e", "D", "d",  "R", "r", "F", "f", "S", "s", "B", "b"
+export const SLICE_ROTATION_CODES = [ "R", "M", "L", "U", "E", "D", "F", "S", "B",  "r", "m", "l", "u", "e", "d", "f", "s", "b"];
+export const CUBE_ROTATION_CODES = ["X", "Y","Z", "x", "y", "z"];
+// on an x rotation, X and x stay the same, 
+// if it's positive: YzyZ else YZyz
+// on a y rotation, Y and y stay the same
+// if it's positive: XZxz else XzxZ
+// x: [0] [3] [1,5,4,2] | [0] [3]  [1,2,4,5]
+// y: [1] [4] [0,2,3,5] | [1] [4]  [0,5,3,2]
+// z: [2] [5] [0,4,1,3] | [2] [5]  [0,3,1,4]
+export const CUBE_REORIENTATION: Record<CubeCode, CubeCode[]> = {
+    "X": ["Y","z","y","Z"],
+    "Y": ["X","z","x","Z"], 
+    "Z": ["X","y","x","Y"],
+    "x": ["Y","Z","y","z"],
+    "y": ["X","Z","x","z"],
+    "z": ["X","Y","x","y"]
+}/* 
+"Y": ["X","Z","x","z"],
+"y": ["X","z","x","Z"], *//* 
+export const SLICE_REORIENTATION: Record<CubeCode, string[][]> = {
+    "X": [["F", "U", "b", "d"], ["f", "u", "B", "D"], ["E", "s", "e", "S"]],
 
+    "Y": [["F", "l", "b", "R"], ["f", "L", "B", "r"], ["M", "S", "m", "s"]],
+
+    "Z": [["l", "U", "R", "b"], ["L", "u", "r", "B"], ["E", "M", "e", "m"]],
+
+    "x": [["d", "b", "U", "F"], ["D", "B", "u", "f"], ["S", "e", "s", "E"]],
+
+    "y": [["R", "b", "l", "F"], ["r", "B", "L", "f"], ["s", "m", "S", "M"]],
+
+    "z": [["b","R", "U", "l"], ["B", "r", "u", "L"], ["m", "e", "M", "E"]]
 } */
+
+export const SLICE_REORIENTATION: Record<CubeCode, string[][]> = {
+    
+    "X": [["d", "b", "U", "F"], ["D", "B", "u", "f"], ["S", "e", "s", "E"]],
+    "Y": [["F", "l", "b", "R"], ["f", "L", "B", "r"], ["M", "S", "m", "s"]],
+/*     
+    "Y": [["F", "b"], ["l", "R"], ["f", "B"], ["L", "r"], ["M", "S", "m", "s"]],
+ */
+    "Z": [["l", "U", "R", "b"], ["L", "u", "r", "B"], ["E", "M", "e", "m"]],
+    "x": [["F", "U", "b", "d"], ["f", "u", "B", "D"], ["E", "s", "e", "S"]],
+    "y": [["R", "b", "l", "F"], ["r", "B", "L", "f"], ["s", "m", "S", "M"]],
+    /* 
+    "y": [["R", "l"], ["b", "F"], ["r", "L"], ["B", "f"], ["s", "m", "S", "M"]], */
+    "z": [["b","R", "U", "l"], ["B", "r", "u", "L"], ["m", "e", "M", "E"]]
+}
+/* L
+// ["X", "x", "F", "f", "S", "s", "B", "b", "Y", "y", "U", "u", "E", "e", "D", "d", "Z", "z", "L", "l", "M", "m", "R", "r"];
+
+    "axis": ["x", "y", "z"],
+    "orientation": ["+", "-"],
+    "slice": ["-1", "0", "1"]
+  }
+  let index = this.rotationLetters.indexOf(letter);
+  let axis = this.rotationAction.axis[Math.floor(index / 8)] as Axis;
+  let orientation = this.rotationAction.orientation[index % 2] as Orientation;
+  let sliceIndex = Math.floor(index/2)%4;
+  let slice = sliceIndex ? +this.rotationAction.slice[sliceIndex-1] : undefined;
+  this.rubix.rotationInput(axis, orientation, slice);
+   */
+export const SLICE_ROTATION_MAP: Record<string, RotationAction> = {
+
+
+}
+

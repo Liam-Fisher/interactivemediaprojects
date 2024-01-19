@@ -5,13 +5,15 @@ Display
 // material indices are ordered like so:
     (front, back, top, bottom, left, right)
 
-Event Handlers
-    - Get the names of the objects touched on pointerUp and pointerDown and the indexes of the faces touched
-    - given the
+
+//TODO iremove the pointer class and raycasting detection until rnbo works
+// remove cube rotations 
+
+// fix trhe facelet rotation 
 
 
-HELP
-
-    - cubes keep disappearing after being rotated
-    -  z position of rotated slicce incorrect on left side
-    
+// Button interface
+// smaller? 
+// add an input fdor direct coding
+//
+// style the buttons better?

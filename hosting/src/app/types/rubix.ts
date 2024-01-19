@@ -1,9 +1,10 @@
 import { ElementRef, NgZone } from '@angular/core';
 import * as THREE from 'three';
-import { CubeletState } from '../pages/rubix/logic/cubeletState';
-import { FaceletState } from '../pages/rubix/logic/faceletState';
 import { RubixCubeletStateService } from '../services/rubix/rubix-cubelet-state/rubix-cubelet-state.service';
 import { RubixFaceletStateService } from '../services/rubix/rubix-facelet-state/rubix-facelet-state.service';
+import { RubixGameStateService } from '../services/rubix/rubix-game-state/rubix-game-state.service';
+import { RubixRotationService } from '../services/rubix/rubix-rotation/rubix-rotation.service';
+import { RubixPointerService } from '../services/rubix/rubix-pointer/rubix-pointer.service';
 
 export enum Face {
     'front',
@@ -73,25 +74,14 @@ export interface IRubixGame {
     moveCount: number;
 }
 
-export interface IRubix extends IRubixDisplay{
-    
+export interface IRubix  {
     ngZone: NgZone;
-
     cubelets: RubixCubeletStateService;
     facelets: RubixFaceletStateService;
-
+    game: RubixGameStateService;
+    rotation: RubixRotationService;
+    pointer: RubixPointerService;
     display: ElementRef<HTMLCanvasElement>;
-    gameState: IRubixGame;
-    graphicsState: IRubixGraphics;
-
-    rotationState: IRubixRotation;
-    pointerState: IRubixPointer;
-
-
-    onPointerDown: (event: PointerEvent) => void;
-    onPointerUp: (event: PointerEvent) => void;
-    onWindowResize: () => void;
-    
 }
 
 export type GameState = 'scrambling'|'solving'|'solved';

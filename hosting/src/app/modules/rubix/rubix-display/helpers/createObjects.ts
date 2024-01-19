@@ -1,16 +1,15 @@
 import { Colors, IRubix, Position } from "src/app/types/rubix";
-import { addressToPosition, positionToColors } from "../helpers/converting";
 import * as THREE from 'three';
-import AxisGridHelper from "../helpers/axisGridHelper";
 import { GUI } from 'lil-gui';
 import { RubixSceneService } from "src/app/services/rubix/rubix-scene/rubix-scene.service";
+import { addressToPosition, positionToColors } from "src/app/services/rubix/helpers/converting";
+import AxisGridHelper from "src/app/services/rubix/helpers/axisGridHelper";
 const gui = new GUI();
 
-export function createObjects({scene, camera}: RubixSceneService, names: string[],) {
-    const {cubeletSize, colorPalette, cameraDistance} = component.graphicsState;
+export function createObjects({scene, camera, lights, cubeletSize, colorPalette, cameraDistance}: RubixSceneService, names: string[]) {
     addShell(scene, cubeletSize);
     addCameraSphere(scene, camera, cameraDistance);
-    createLights(scene, component.graphicsState.lights);
+    createLights(scene, lights);
     addCubelets(scene, names, cubeletSize, colorPalette);
 }
 
@@ -44,7 +43,6 @@ function createCubelet(address: number, name: string, size: number, palette: num
     const position = addressToPosition(address);
     const colors = positionToColors(position);
     const materials = createMaterials(palette, Object.values(colors));
-    logCubelet(address, name, position, colors);
     const mesh = createCubeMesh(name, position, size, materials);
     mesh.rotateY(Math.PI/-2);
     return mesh;
@@ -70,18 +68,6 @@ function createCubeMesh(name: string, position: Position, size: number, material
 function createHelper(mesh: THREE.Mesh, name: string) {
     const helper = new AxisGridHelper(mesh, 1);
     gui.add(helper, 'visible').name(name);
-}
-function createScene(component: IRubix) {
-    component.scene = new THREE.Scene();
-}
-function createRaycaster(component: IRubix) {
-    component.raycaster = new THREE.Raycaster();
-}
-function createRenderer(component: IRubix) {
-    component.renderer = new THREE.WebGLRenderer({antialias: true, canvas: component.display.nativeElement});;
-}
-function createCamera(component: IRubix) {
-    component.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
 }
 function createLights(scene: THREE.Scene, lights: THREE.PointLight[]) {
     
