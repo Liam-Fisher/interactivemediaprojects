@@ -24,6 +24,9 @@ export const SIDE_FACES: Record<Axis,[FaceName,undefined,FaceName]> = {
     "z": ['front', undefined, 'back']
 } */
 
+// each 
+export type VisibleFace = Exclude<FaceName, 'back'|'left'|'bottom'>;
+
 export const RING_FACES: Record<Axis, Record<Orientation,FaceName[]>> = {
     "x": {
         "+": ['front', 'bottom', 'back', 'top'],

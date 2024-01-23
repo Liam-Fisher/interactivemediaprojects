@@ -4,6 +4,8 @@ import { RubixCubeletStateService } from '../rubix-cubelet-state/rubix-cubelet-s
 import * as THREE from 'three';
 import { RubixSceneService } from '../rubix-scene/rubix-scene.service';
 import { createGroup, removeGroup } from '../helpers/three';
+import { BehaviorSubject } from 'rxjs';
+import { FACELET_ROTATION_SLICES, RING_FACES } from '../helpers/data';
 
 
 // use the normals to determine the axis of rotation
@@ -11,27 +13,19 @@ import { createGroup, removeGroup } from '../helpers/three';
   providedIn: 'root'
 })
 export class RubixRotationService {
-  isCameraRotating = false;
   isCubeRotating = false;
-  queue: RotationAction[] = [];
   progress: number = 0;
   frames!: number;
   angle: number = 0;
   vector = new THREE.Vector3(1,0,0);
   group: THREE.Group = new THREE.Group();
-  names: string[] = [];
+  faceColors = new BehaviorSubject<number[]>([]);
+  moveInput = new BehaviorSubject<number[]>([]);
   constructor(private scene: RubixSceneService, private cubelets: RubixCubeletStateService) { }
-get isRotating() {
-  return this.isCameraRotating || this.isCubeRotating;
-}
+
   animateRotation() {
       this.progress++;
-      if(this.isCameraRotating) { 
-        this.scene.rotateCamera(this.vector, this.angle)
-      }
-      else {
-        this.group.rotateOnWorldAxis(this.vector, this.angle);
-      }
+      this.group.rotateOnWorldAxis(this.vector, this.angle);
       if(this.progress >= this.frames) {
         this.completeRotation();
       }
@@ -39,27 +33,41 @@ get isRotating() {
   }
   completeRotation() {
       this.progress = 0;
-        removeGroup(this.scene.scene, this.cubelets.rotated, this.group);
-        this.scene.getAllFaceColors(this.cubelets.faceColors);
-        this.isCubeRotating = false;
-      
-  }
-  initializeRotation(axis: Axis, orientation: Orientation) {
-    // reorient
-    
-    this.vector.set( +(axis === 'x'), +(axis === 'y'), +(axis === 'z') );
-    this.angle = Math.PI / (this.frames * (orientation === '+' ? 2 : -2));
-  }
-  initializeCameraRotation(axis: Axis, orientation: Orientation) {
-      this.isCameraRotating = true;
+      removeGroup(this.scene.scene, this.cubelets.rotated, this.group);
       this.isCubeRotating = false;
-      // change the properties of the Orientation Service
+      this.faceColors.next(this.scene.getAllFaceColors(this.cubelets.faceColors));
   }
-  initializeSliceRotation(axis: Axis, orientation: Orientation, slice: number) {
-    console.log('initializing SliceRotation');
+  initializeRotation(axis: Axis, orientation: Orientation, slice: number, state: string) {
+        console.log('initializing SliceRotation');
+        this.frames = state === 'scrambling' ?  this.scene.framesPerScrambleRotation : this.scene.framesPerRotation;
+        this.vector.set( +(axis === 'x'), +(axis === 'y'), +(axis === 'z') );
+        this.angle = Math.PI / (this.frames * (orientation === '+' ? 2 : -2));
         this.cubelets.rotate(axis, orientation, slice);
         this.group = createGroup(this.scene.scene,  this.cubelets.rotated);
-        this.isCameraRotating = false;
         this.isCubeRotating = true;
+
+        this.moveInput.next([]);
+      }
+      emitChangedFacelets(axis: Axis, orientation: Orientation, slice: number)  {
+        let moveInput = [];
+        
+        let changedFaces = RING_FACES[axis][orientation];
+      
+        for(let face of changedFaces) {
+          if(face==='front') {
+            moveInput.push(0);
+          }
+          else if(face==='right') {
+            moveInput.push(1);
+          }
+          else if(face==='top') {
+            moveInput.push(2);
+          }
+          else {
+            continue;
+          }
+          moveInput.push(...FACELET_ROTATION_SLICES[axis][face][slice+1]);
+        }
+        this.moveInput.next(moveInput);
       }
 }

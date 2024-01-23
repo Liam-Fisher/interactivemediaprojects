@@ -1,56 +1,61 @@
-import { Injectable } from '@angular/core';
-import { computed } from '@angular/core';
+import { EffectRef, Injectable, Injector, WritableSignal, signal } from '@angular/core';
 import * as RNBO from '@rnbo/js';
-import { RnboLoaderService } from '../loader/rnbo-loader.service';
-import { Form, FormControl } from '@angular/forms';
-import { BehaviorSubject, Subscription } from 'rxjs';
-import { IRnboService } from '../helpers';
-
+import { IRnboObject, IRnboSignalService } from '../abstract_classes/signalService';
+import { Subscription } from 'rxjs';
 // hub for parameter changes
 
-export interface Parameter {
-  target: RNBO.Parameter;
-  subject: BehaviorSubject<number | null>;
-  subscriptions: Subscription[]; // type this later
-  meta: any; // type this later
-}
+export type IParameter = IRnboObject<number, any>&{
+  param: RNBO.Parameter;
+};
+
 
 // operates on a pubsub model between device parameters and ui components
 @Injectable({
   providedIn: 'root',
 })
-export class RnboParametersService extends IRnboService<RNBO.Parameter, number | null, any> {
+export class RnboParametersService extends IRnboSignalService<number, IParameter, number|null> {
   // this contains all parameters for all devices
-  map = new Map<string, Map<string, Parameter>>();
-  constructor() { super();}
-  
+  map = new Map<string, Map<string, IParameter>>();
+  ctlSubscriptions = new Map<string, Map<string, Subscription>>();
+  deviceSubscriptions=  new Map<string, RNBO.IEventSubscription>();
+
+  constructor() { super(); }
+  parseInput(input: number|null): number|null {
+    return input;
+  }
+  formatData(data: number): number {
+    return data;
+  }
   async addDevice(
     device_id: string,
     device: RNBO.BaseDevice,
-    patcher: RNBO.IPatcher
+    patcher: RNBO.IPatcher,
+    injector: Injector,
+    debug = false
   ) {
     this.map.clear();
     for (let i = 0; i < patcher.desc.numParameters; i++) {
+
       let desc = patcher.desc.parameters[i] as any; // TODO: type this to include meta
-      let meta = desc?.meta;
-      let target = device.parameters[i];
+      const meta = desc?.meta;
+      const param = device.parameters[i] as RNBO.Parameter;
 
-      let subjectSubscriber = (value: number | null) => {
-        if ((value === null)||(target.value === value)) return;
-          target.value = value;
-      };
-
-      let obj = this.createObject(device_id, target.name, target, meta, target.initialValue);
-      this.setObj(device_id, target.name, obj);
-      this.subscribe(obj, subjectSubscriber);
-
-      let {subscriptions, subject} = obj;
-
-      target.changeEvent.subscribe((value: number) => {
-        if ((subject.value !== value)) subject.next(value);
-      });
+      const obj = this.createObject(device_id, param.name, param, meta, param.initialValue);
+      const sig = obj.sig;
+      this.createEffect(() => param.value = sig(), obj, injector);
     }
+    this.deviceSubscriptions.set(device_id, this.subscribeToDevice(device_id, device));
   }
-  
+  subscribeToDevice(device_id: string, device: any): RNBO.IEventSubscription {
+    return device.parameterChangeEvent.subscribe((param: RNBO.Parameter) => {
+          this.setData(device_id, param.name, param.value);
+        });
+  }
+  createObject(device_id: string | null, key: string | null, param: RNBO.Parameter, meta: any, initialValue: number): IParameter {
+    const sig = signal(initialValue);
+    const obj = {param, meta, sig};
+    this.setObj(device_id, key, obj);
+    return obj;
+  }
 }
 

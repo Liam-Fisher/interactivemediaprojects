@@ -1,10 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Injector, signal } from '@angular/core';
 import { FirebaseStorageService } from '../../firebase-storage/firebase-storage.service';
 import { WebAudioService } from '../../audio/web-audio.service';
 import * as RNBO from '@rnbo/js';
 import { BehaviorSubject, Subject, Subscription } from 'rxjs';
-import { Audio } from 'three';
-import { IRnboService } from '../helpers';
+import { IRnboObject, IRnboSignalService } from '../abstract_classes/signalService';
 
 
 // multibuffers are not written too since they contain no unique data, and are a device-local structure for organizing buffers
@@ -25,25 +24,22 @@ export interface BufferLoadData {
     buffer_id: BufferID,
     src: BufferSource|null
 }
-interface BufferObj {
-  target: AudioBuffer|null;
-  subject: BehaviorSubject<BufferSource|null>;
-  subscriptions: Subscription[];
-  meta: any;
-}
+type IBuffer = IRnboObject<AudioBuffer, BufferMetaData>;
 // IMPORTANT: this will link buffers between devices if they have the same buffer_id and the "buffer~" tag
 // if you want to avoid this, use the "data" object instead of the "buffer" object in the patcher
 @Injectable({
   providedIn: 'root'
 })
-export class RnboBufferService extends IRnboService<AudioBuffer|null, BufferSource|null, any> {
+export class RnboBufferService extends IRnboSignalService<AudioBuffer|null, IBuffer, BufferSource> {
   // device_id -> buffer_id -> buffer
-  map: Map<string, Map<string, BufferObj>> = new Map();
-  isLoading = new BehaviorSubject<[string,string]|null>(null);
+  map: Map<string, Map<string, IBuffer>> = new Map();
+  ctlSubscriptions = new Map<string, Map<string, Subscription>>();  
+  deviceSubscriptions = new Map<string, RNBO.IEventSubscription>();
+  isLoading = signal<[string,string]|null>(null);
 
   constructor(public storage: FirebaseStorageService, public audio: WebAudioService) { super(); }
 
-  async addDevice(device_id: string, device: RNBO.BaseDevice, patcher: RNBO.IPatcher) {
+  async addDevice(device_id: string, device: RNBO.BaseDevice, patcher: RNBO.IPatcher, injector: Injector) {
     
     let refs = patcher.desc.externalDataRefs as BufferMetaData[];
     let bufferMeta = (patcher.desc.meta as any)?.buffers
@@ -54,16 +50,16 @@ export class RnboBufferService extends IRnboService<AudioBuffer|null, BufferSour
             // if file or url is not null, then the subject will be updated with the fetched buffer when it is loaded
             // else, the buffer will be released and the target will be updated with the device's default buffer on load
 
-            let obj = this.createObject(device_id, id, null, meta, file??url??null);
+            let obj = this.createObject(null, meta, file??url??null, true, false);
             this.setObj(device_id, tag, obj);
-
-            let subscriber = (value: BufferSource|null) => {
+            let s = obj.input;
+            if(!s) throw new Error('buffer subject is null');
+            let subscriber = () => {
               this.isLoading.next([device_id, id]);
-              this.setBuffer(device_id, device, id, value).then(() => {
-                this.isLoading.next(null)
+              this.setBuffer(device_id, device, id, s?.()??null).then(() => {
+                this.isLoading.next(null);
               });
             };
-            this.subscribe(obj, subscriber);
         }
   }
 }

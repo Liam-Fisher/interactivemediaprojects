@@ -5,6 +5,7 @@ import { RnboLoaderService } from 'src/app/services/rnbo/loader/rnbo-loader.serv
 import { RnboMessagingService } from 'src/app/services/rnbo/messages/rnbo-messaging.service';
 import { RnboParametersService } from 'src/app/services/rnbo/parameters/rnbo-parameters.service';
 import { RnboDeviceComponent } from '../rnbo-device/rnbo-device.component';
+import { ParamIdInputComponent } from '../param-id-input/param-id-input.component';
 // this is kind of a monster component but it's mostly for debugging
 // specifically, it encapsulates a device and all of its parameters and inports in a single component, so that you can load a device and then play with it right away
 // usually, you would load 
@@ -20,42 +21,24 @@ import { RnboDeviceComponent } from '../rnbo-device/rnbo-device.component';
     }}</mat-option>
   </mat-select>
 </mat-form-field>
-
+<!-- 
 <app-rnbo-device
   *ngIf="idFormControl.value !== null"
   [device_id]="idFormControl.value"
   (loadedEvent)="loadOptions($event)"
 ></app-rnbo-device>
-
-<mat-form-field>
-  <mat-label>Parameter</mat-label>
-  <mat-select [formControl]="paramFormControl">
-    <mat-option *ngFor="let id of parameterOptions | async" [value]="id">{{
-      id
-    }}</mat-option>
-  </mat-select>
-</mat-form-field>
-
-<app-rnbo-material-parameter
-  *ngIf="paramFormControl.value !== null"
-  [device_id]="idFormControl.value"
-  [parameter_id]="paramFormControl.value"
+ -->
+<app-param-id-input [device_id]="idFormControl.value"></app-param-id-input>
+<!-- 
+<app-rnbo-material-parameter [device_id]="idFormControl.value"
+  [parameter_id]="paramInput.selected.valueChanges|async"
 >
-</app-rnbo-material-parameter>
+</app-rnbo-material-parameter> -->
 
-<mat-form-field>
-  <mat-label>Tag</mat-label>
-  <mat-select [formControl]="tagFormControl">
-    <mat-option *ngFor="let id of tagOptions | async" [value]="id">{{
-      id
-    }}</mat-option>
-  </mat-select>
-</mat-form-field>
 
 <app-rnbo-inport-input
   *ngIf="tagFormControl.value !== null"
   [device_id]="idFormControl.value"
-  [tag_id]="tagFormControl.value"
 >
 </app-rnbo-inport-input>
 
@@ -65,10 +48,13 @@ import { RnboDeviceComponent } from '../rnbo-device/rnbo-device.component';
 })
 export class RnboGlobalInputComponent {
   @Input() device_folder: string = 'testing';
+  @ViewChild(ParamIdInputComponent) paramInput!: ParamIdInputComponent;
   idFormControl = new FormControl<string|null>(null, [ Validators.required ]);
   tagFormControl = new FormControl<string|null>(null, [ Validators.required ]);
   paramFormControl = new FormControl<string|null>(null, [ Validators.required ]);
 
+  targetTag = new BehaviorSubject<string[]>([]);
+  targetParameter = new BehaviorSubject<string[]>([]);
   // these are for select ui components
   selectedDevice = new BehaviorSubject<string|null>(null);
   storedDeviceOptions = new BehaviorSubject<string[]>([]);

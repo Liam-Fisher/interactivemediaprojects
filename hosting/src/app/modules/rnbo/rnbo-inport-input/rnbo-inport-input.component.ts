@@ -1,40 +1,42 @@
-import { Component, Input, SimpleChanges, effect } from '@angular/core';
-import { FormControl, ValidationErrors, Validators } from '@angular/forms';
+import { Component, Input, Signal, WritableSignal } from '@angular/core';
+import { FormControl, NgForm, ValidationErrors, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { RnboMessagingService } from 'src/app/services/rnbo/messages/rnbo-messaging.service';
 @Component({
   selector: 'app-rnbo-inport-input',
   template: `
-<mat-form-field>
-  <input matInput [formControl]="control" placeholder="input message">
-  <mat-error *ngIf="control.hasError('required')">This field is required</mat-error>
-  <mat-error *ngIf="control.hasError('invalidNumber')">message must be space-separated numbers</mat-error>
+  <form #f="ngForm" (ngSubmit)="sendValue(f)">
+<app-tag-input [device_id]="device_id" [tag_id]="tag_id"></app-tag-input>
+<mat-form-field [formControl]="messageInputControl">
+  <input matInput placeholder="input message">
+  <mat-error *ngIf="messageInputControl.hasError('required')">This field is required</mat-error>
+  <mat-error *ngIf="messageInputControl.hasError('invalidNumber')">message must be space-separated numbers</mat-error>
 </mat-form-field>
+<button mat-button type="submit">Send</button> 
+</form>
   `,
-  styleUrls: ['./rnbo-inport-input.component.scss']
+  styles: [
+    ``
+  ]
 })
 export class RnboInportInputComponent {
-  @Input() device_id!: string|null;
-  @Input() tag_id!: string|null; 
-  control = new FormControl<string|null> (null, [Validators.required, this.validateNumbers]);
+  @Input() device_id!: Signal<string>;
+  @Input() tag_id!: WritableSignal<string>;
+  // add a an input type option that conditionally renders ui components of the selected type e.g. toggle, input, keyboard
+  /* 
+  @ViewChild(TagInputComponent) tagInput!: TagInputComponent; */
+  messageInputControl = new FormControl<string|null> (null, [Validators.required, this.validateNumbers]);
+
   subscription: Subscription|null = null;
   constructor(public messageHub: RnboMessagingService) { }
-  ngOnChanges(simpleChanges: SimpleChanges) {
-    let {device_id, tag_id} = simpleChanges;
-    if (device_id || tag_id) {
-      if(this.subscription) this.subscription.unsubscribe();
-      if(this.device_id && this.tag_id) {
-        this.subscription = this.messageHub.bindToControl(this.device_id, this.tag_id, this.control);
-        this.control.setValue(this.messageHub.getVal(this.device_id, this.tag_id));
-      }
-    }
+  sendValue(f: NgForm) {
+    console.log(`form value: ${JSON.stringify(f.value)}`);
+    if(f.valid) {
+      this.messageHub.setSig(this.device_id(), this.tag_id(), this.messageHub.parseInput(this.messageInputControl?.value??''));
+    } 
   }
-  ngOnDestroy() {
-    if(this.subscription) this.subscription.unsubscribe();
-  }
-  validateNumbers(control: FormControl): ValidationErrors | null {
-    
-    const numbers = control.value?.split(' ') ?? [];
+  validateNumbers(data: FormControl): ValidationErrors | null {
+    const numbers = data.value?.split(' ') ?? [];
     for (const num of numbers) {
       if (isNaN(Number(num))) {
         return { invalidNumber: true };

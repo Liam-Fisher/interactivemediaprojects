@@ -1,13 +1,13 @@
 
 import { Axis, Colors, FaceName, Orientation } from "src/app/types/rubix";
-import { FACE_NAMES,  FACELET_ROTATION_SLICES, RING_FACES, SIDE_FACES } from "../helpers/data";
-import { Injectable } from "@angular/core";
-import { rotateFace, rotateSlice } from "../helpers/math";
-import { logFacelets } from "../helpers/loggers";
-
+import { FACE_NAMES,  FACELET_ROTATION_SLICES, RING_FACES, SIDE_FACES } from "../../../hosting/src/app/services/rubix/helpers/data";
+/* import { Injectable } from "@angular/core"; */
+import { rotateFace, rotateSlice } from "../../../hosting/src/app/services/rubix/helpers/math";
+import { logFacelets } from "../../../hosting/src/app/services/rubix/helpers/loggers";
+/* 
 @Injectable({
   providedIn: 'root'
-})
+}) */
 export class RubixFaceletStateService {
     readonly materialIndices = [0,1,2,3,4,5];
     readonly names: FaceName[] = FACE_NAMES;

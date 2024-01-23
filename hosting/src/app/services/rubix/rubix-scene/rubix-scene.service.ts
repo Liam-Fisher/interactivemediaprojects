@@ -3,6 +3,8 @@ import * as THREE from 'three';
 import { COLOR_PALETTE } from '../helpers/data';
 import { createObjects } from '../helpers/three';
 import { Axis, Colors } from '../helpers/cubie';
+import { BehaviorSubject } from 'rxjs';
+import { RnboMessagingService } from '../../rnbo/messages/rnbo-messaging.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -26,6 +28,9 @@ export class RubixSceneService {
     this.lights = [];
     createObjects(this, cubeletNames);
     this.resize();
+  }
+  ngOnDestroy() {
+    this.renderer.dispose();
   }
   get dims(): [number, number] {
     return [this.renderer.domElement.clientWidth, this.renderer.domElement.clientHeight];
@@ -53,7 +58,6 @@ export class RubixSceneService {
     colorIndexFromRay(castFrom: THREE.Vector3, castTo: THREE.Vector3): number {
       this.raycaster.set(castFrom, castTo);
       let intersected = this.raycaster.intersectObjects(this.scene.children);
-
       for(let intersection of intersected) {
         let name = intersection.object.name;
         let index = intersection.face?.materialIndex ?? null;
@@ -79,34 +83,13 @@ export class RubixSceneService {
       }
     }
     getAllFaceColors(tgt: Pick<Colors<number[]>, 'front'|'right'|'top'>) {
-      // front, left, top, left->right top->bottom
+      console.log(`getting all face colors`);
       let castTo = new THREE.Vector3(0,0,0);
       let castFrom = new THREE.Vector3(0,0,0);
       this.getFaceColors(tgt.front, ['x', 'y','z'], castTo, castFrom);
       this.getFaceColors(tgt.right, ['z','y','x'], castTo, castFrom);
       this.getFaceColors(tgt.top, ['y','x','z'], castTo, castFrom);
       tgt.top.reverse();
+      return [...tgt.front, ...tgt.right, ...tgt.top];
     }
-    
 }
-/* 
-
-      console.log(`....front.....`);
-      console.log(`${faceColors.front.slice(0,3).join('|')}`);
-      console.log(`${faceColors.front.slice(3,6).join('|')}`);
-      console.log(`${faceColors.front.slice(6).join('|')}`);
-
-      console.log(`..............`);
-      console.log(`....right.....`);
-      console.log(`right: ${faceColors.right.slice(0,3).join('|')}`);
-      console.log(`right: ${faceColors.right.slice(3,6).join('|')}`);
-      console.log(`right: ${faceColors.right.slice(6).join('|')}`);
-      
-      console.log(`..............`);
-      console.log(`....top.....`);
-      console.log(`top: ${faceColors.top.slice(0,3).join('|')}`);
-      console.log(`top: ${faceColors.top.slice(3,6).join('|')}`);
-      console.log(`top: ${faceColors.top.slice(6).join('|')}`);
-      console.log(`..............`);
-      
-      */

@@ -7,6 +7,7 @@ import { Parameter, RnboParametersService } from 'src/app/services/rnbo/paramete
 @Component({
   selector: 'app-rnbo-material-parameter',
   template: `
+  <div class="parameter-container" *ngIf="parameter">
     <mat-label>{{ displayName }}</mat-label>
     <mat-select 
     *ngIf="(enumValues?.length)"
@@ -27,6 +28,7 @@ import { Parameter, RnboParametersService } from 'src/app/services/rnbo/paramete
     >
       <input matSliderThumb [formControl]="control" />
     </mat-slider>
+</div>
   `,
   styleUrls: ['./rnbo-material-parameter.component.scss'],
 })
@@ -35,7 +37,7 @@ export class RnboMaterialParameterComponent {
   @Input() parameter_id!: string|null;
   control = new FormControl<number|null>(null);
   subscription: Subscription|null = null;
-  parameter!: Parameter|null;
+  parameter: Parameter|null = null;
   constructor(public parameterHub: RnboParametersService) { }
 
   ngOnChanges(simpleChanges: SimpleChanges) {

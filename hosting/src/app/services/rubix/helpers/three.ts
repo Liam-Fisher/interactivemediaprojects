@@ -33,8 +33,8 @@ export function removeGroup(scene: THREE.Scene, names: string[], group: THREE.Gr
       object.position.copy(position);
       object.quaternion.copy(quaternion);
       scene.add(object);
-      console.log(`removed ${name} rotateX: ${object.rotation.x}, rotateY: ${object.rotation.y}, rotateZ: ${object.rotation.z}`);
-      console.log(object);
+     // console.log(`removed ${name} rotateX: ${object.rotation.x}, rotateY: ${object.rotation.y}, rotateZ: ${object.rotation.z}`);
+     // console.log(object);
    
     }
   }

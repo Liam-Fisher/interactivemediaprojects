@@ -5,13 +5,12 @@ import { RubixSceneService } from '../rubix-scene/rubix-scene.service';
 
 import {  getFaceDirection } from '../helpers/math';
 import { FaceName, Swipe } from 'src/app/types/rubix';
-import { RubixFaceletStateService } from '../rubix-facelet-state/rubix-facelet-state.service';
 import { RubixCubeletStateService } from '../rubix-cubelet-state/rubix-cubelet-state.service';
 import { RubixGameStateService } from '../rubix-game-state/rubix-game-state.service';
 import { getCubeRotation, getSliceRotation } from '../helpers/logic';
 @Injectable({
   providedIn: 'root'
-})
+}) 
 export class RubixPointerService {
   isDown!: boolean;
   framesDown!: number;
@@ -22,7 +21,7 @@ export class RubixPointerService {
   intersection!: THREE.Intersection<THREE.Object3D<THREE.Object3DEventMap>>|null;
 
   readonly distanceThreshold: number = 0.02;
-  constructor(public scene: RubixSceneService, public game: RubixGameStateService, public facelets: RubixFaceletStateService, public cubelets: RubixCubeletStateService) { 
+  constructor(public scene: RubixSceneService, public game: RubixGameStateService, public cubelets: RubixCubeletStateService) { 
     this.reset();
   }
   reset() {
@@ -61,11 +60,12 @@ export class RubixPointerService {
 console.log(`clickedName: ${clickedFace} ${clickedName}`);
      if(currentIntersection && clickedName && (typeof clickedFace === 'number') && (clickedFace === currentFace)) {
       console.log(`slice rotation ${clickedName}`);
-      this.sliceRotation(this.facelets.names?.[clickedFace], currentIntersection, clickedName);
+
+      //this.sliceRotation(this.facelets.names?.[clickedFace], currentIntersection, clickedName);
     }
     else {
       console.log('cube rotation');
-      this.cubeRotation(currentPosition);
+      //this.cubeRotation(currentPosition);
     }
   }
   sliceRotation(startFace: FaceName, currentIntersection: THREE.Intersection<THREE.Object3D<THREE.Object3DEventMap>>, clickedName: string) {

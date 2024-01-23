@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { RubixFaceletStateService } from '../rubix-facelet-state/rubix-facelet-state.service';
+import { RubixFaceletStateService } from '../../../../../../planning/rubixTesting/rubix-facelet-state/rubix-facelet-state.service';
 import { Colors, GameState, Orientation, RotationAction } from 'src/app/types/rubix';
 import { randomAxis, randomSlice } from '../helpers/math';
 import { RubixRotationService } from '../rubix-rotation/rubix-rotation.service';
@@ -74,19 +74,9 @@ export class RubixGameStateService {
   }
   makeMove() {
     let{axis, orientation, slice} = this.moves.shift()??{};
-    if(axis && orientation) {
+    if(axis && orientation && slice!==undefined) {
       console.log(`making move ${axis} ${orientation} ${slice}`);
-      this.rotator.frames = this.state === 'scrambling' ?  this.scene.framesPerScrambleRotation : this.scene.framesPerRotation;
-      this.rotator.initializeRotation(axis, orientation);
-      if(slice !== undefined) {
-       // this.facelets.rotate(axis, orientation, slice);
-       
-        this.rotator.initializeSliceRotation(axis, orientation, slice);
-      }
-      else {
-        console.log(`making camera move ${axis} ${orientation}`);
-        this.rotator.initializeCameraRotation(axis, orientation);
-      }
+      this.rotator.initializeRotation(axis, orientation, slice, this.state);
       return true;
     }
     return false;

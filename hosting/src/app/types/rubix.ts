@@ -1,7 +1,7 @@
 import { ElementRef, NgZone } from '@angular/core';
 import * as THREE from 'three';
 import { RubixCubeletStateService } from '../services/rubix/rubix-cubelet-state/rubix-cubelet-state.service';
-import { RubixFaceletStateService } from '../services/rubix/rubix-facelet-state/rubix-facelet-state.service';
+import { RubixFaceletStateService } from '../../../../planning/rubixTesting/rubix-facelet-state/rubix-facelet-state.service';
 import { RubixGameStateService } from '../services/rubix/rubix-game-state/rubix-game-state.service';
 import { RubixRotationService } from '../services/rubix/rubix-rotation/rubix-rotation.service';
 import { RubixPointerService } from '../services/rubix/rubix-pointer/rubix-pointer.service';

@@ -9,6 +9,7 @@ import { RubixRotationInputComponent } from './rubix-rotation-input/rubix-rotati
 import { MatButtonModule } from '@angular/material/button';
 import {  MatFormFieldModule } from '@angular/material/form-field';
 import {  MatInputModule } from '@angular/material/input';
+import { RnboModule } from '../rnbo/rnbo.module';
 
 
 @NgModule({
@@ -21,6 +22,7 @@ import {  MatInputModule } from '@angular/material/input';
   imports: [
     CommonModule,
     RubixRoutingModule,
+    RnboModule,
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule

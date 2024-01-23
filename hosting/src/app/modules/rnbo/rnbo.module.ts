@@ -12,13 +12,19 @@ import {MatButtonModule} from '@angular/material/button';
 import { RnboGlobalInputComponent } from './rnbo-global-input/rnbo-global-input.component';
 import { RnboMaterialParameterComponent } from './rnbo-material-parameter/rnbo-material-parameter.component';
 import { RnboInportInputComponent } from './rnbo-inport-input/rnbo-inport-input.component';
+import { TagInputComponent } from './tag-input/tag-input.component';
+import { ParamIdInputComponent } from './param-id-input/param-id-input.component';
+import { RnboDeviceSelectComponent } from './rnbo-device-select/rnbo-device-select.component';
 
 @NgModule({
   declarations: [
     RnboDeviceComponent,
     RnboGlobalInputComponent,
     RnboMaterialParameterComponent,
-    RnboInportInputComponent
+    RnboInportInputComponent,
+    TagInputComponent,
+    ParamIdInputComponent,
+    RnboDeviceSelectComponent
     
   ],
   imports: [
@@ -31,7 +37,12 @@ import { RnboInportInputComponent } from './rnbo-inport-input/rnbo-inport-input.
     MatSelectModule
 ],
   exports: [
-    RnboGlobalInputComponent
+    RnboGlobalInputComponent,
+    RnboInportInputComponent,
+    RnboMaterialParameterComponent,
+    RnboDeviceComponent,
+    TagInputComponent
+
   ]
 })
 export class RnboModule { }
