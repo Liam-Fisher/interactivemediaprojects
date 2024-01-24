@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output, SimpleChanges, computed } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { BehaviorSubject } from 'rxjs';
-import { RnboParametersService } from 'src/app/services/rnbo/parameters/rnbo-parameters.service';
+import { RnboParametersService } from 'src/app/services/rnbo/parameters/rnbo-parameter-connection.service';
 
 @Component({
   selector: 'app-param-id-input',

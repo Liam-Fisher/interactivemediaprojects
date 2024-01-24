@@ -1,17 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { RubixService } from 'src/app/services/rubix/rubix.service';
+import { RnboDeviceComponent } from '../../rnbo/rnbo-device/rnbo-device.component';
 
 @Component({
   selector: 'app-rubix-rnbo',
   template:`
   <app-rnbo-device device_folder="rubix" (loadedEvent)="deviceLoaded($event)"></app-rnbo-device>
-  <app-rnbo-inport-input [device_id]="active_device_id|async" tag_id="on"></app-rnbo-inport-input>
   `,
   styleUrls: ['./rubix-rnbo.component.scss']
 })
 export class RubixRnboComponent {
     active_device_id = new BehaviorSubject<string|null>(null);
+    @ViewChild(RnboDeviceComponent) device!: RnboDeviceComponent;
     constructor(public rubix: RubixService) { }
     ngOnInit() {  }
     ngAfterViewInit() { }

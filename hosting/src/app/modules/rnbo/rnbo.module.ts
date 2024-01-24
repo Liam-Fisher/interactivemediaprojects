@@ -9,22 +9,25 @@ import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import {MatButtonModule} from '@angular/material/button';
-import { RnboGlobalInputComponent } from './rnbo-global-input/rnbo-global-input.component';
 import { RnboMaterialParameterComponent } from './rnbo-material-parameter/rnbo-material-parameter.component';
-import { RnboInportInputComponent } from './rnbo-inport-input/rnbo-inport-input.component';
+import { RnboInportInputComponent } from './inports/rnbo-inport-input/rnbo-inport-input.component';
 import { TagInputComponent } from './tag-input/tag-input.component';
-import { ParamIdInputComponent } from './param-id-input/param-id-input.component';
 import { RnboDeviceSelectComponent } from './rnbo-device-select/rnbo-device-select.component';
+import { RnboKeyboardComponent } from './rnbo-keyboard/rnbo-keyboard.component';
+import { PortTagSelectComponent } from './inports/port-tag-select/port-tag-select.component';
+import { PortMessageTextInputComponent } from './inports/port-message-text-input/port-message-text-input.component';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @NgModule({
   declarations: [
     RnboDeviceComponent,
-    RnboGlobalInputComponent,
     RnboMaterialParameterComponent,
     RnboInportInputComponent,
     TagInputComponent,
-    ParamIdInputComponent,
-    RnboDeviceSelectComponent
+    RnboDeviceSelectComponent,
+    RnboKeyboardComponent,
+    PortTagSelectComponent,
+    PortMessageTextInputComponent
     
   ],
   imports: [
@@ -34,14 +37,16 @@ import { RnboDeviceSelectComponent } from './rnbo-device-select/rnbo-device-sele
     MatSliderModule,
     FormsModule,
     ReactiveFormsModule,
-    MatSelectModule
+    MatSelectModule,
+    MatButtonModule,
+    MatSlideToggleModule
 ],
   exports: [
-    RnboGlobalInputComponent,
     RnboInportInputComponent,
     RnboMaterialParameterComponent,
     RnboDeviceComponent,
-    TagInputComponent
+    TagInputComponent,
+    RnboKeyboardComponent
 
   ]
 })

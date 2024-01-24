@@ -1,7 +1,7 @@
 import { Injectable, Injector, signal } from '@angular/core';
 import {  Subscription } from 'rxjs';
 import * as RNBO from '@rnbo/js';
-import { RnboParametersService } from '../parameters/rnbo-parameters.service';
+import { RnboParametersService } from '../parameters/rnbo-parameter-connection.service';
 import { IRnboObject, IRnboSignalService } from '../abstract_classes/signalService';
 
 type cmd = 'get' | 'set' | null;
@@ -58,8 +58,8 @@ export class RnboPresetService extends IRnboSignalService<
           this.setData(device_id, this.selectedPresets.get(device_id)??'', 'get');
       });
   }
-  createObject(device_id: string|null, preset_id: string|null, initialValue: cmd, preset: RNBO.IPreset, meta: any): Preset {
-    const obj = {preset, meta, sig: signal(initialValue)};
+  createObject(device_id: string|null, preset_id: string|null, initialValue: string, preset: RNBO.IPreset, meta: any): Preset {
+    const obj = {preset, meta, sig: signal(this.parseInput(initialValue))};
     this.setObj(device_id, preset_id, obj);
     return obj;
   }

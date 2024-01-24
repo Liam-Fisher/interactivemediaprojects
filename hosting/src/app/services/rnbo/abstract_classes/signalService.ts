@@ -92,7 +92,7 @@ export abstract class IRnboSignalService<Data, RnboObject extends IRnboObject<Da
       const obj = this.getObj(device_id, key);
       const sig = obj?.sig;
       if (obj &&sig) {
-        this.createEffect(obj, injector, () => control.setValue(this.formatData(sig())));
+        this.createEffect(() => control.setValue(this.formatData(sig())), obj, injector);
       }
     }
     removeDevice(device_id: string) {

@@ -24,21 +24,34 @@ export interface BufferLoadData {
     buffer_id: BufferID,
     src: BufferSource|null
 }
-type IBuffer = IRnboObject<AudioBuffer, BufferMetaData>;
+type IBufferData = Promise<AudioBuffer|null>;
+type IBuffer = IRnboObject<AudioBuffer|null, BufferMetaData>;
 // IMPORTANT: this will link buffers between devices if they have the same buffer_id and the "buffer~" tag
 // if you want to avoid this, use the "data" object instead of the "buffer" object in the patcher
 @Injectable({
   providedIn: 'root'
 })
 export class RnboBufferService extends IRnboSignalService<AudioBuffer|null, IBuffer, BufferSource> {
-  // device_id -> buffer_id -> buffer
+  // has an additional map in the form: device_id -> buffer_id -> buffer
+  buffers = new Map<string, Map<string, AudioBuffer>>();
   map: Map<string, Map<string, IBuffer>> = new Map();
   ctlSubscriptions = new Map<string, Map<string, Subscription>>();  
   deviceSubscriptions = new Map<string, RNBO.IEventSubscription>();
   isLoading = signal<[string,string]|null>(null);
 
   constructor(public storage: FirebaseStorageService, public audio: WebAudioService) { super(); }
+  
 
+  parseInput(input: BufferSource): AudioBuffer|null {
+    if(input instanceof AudioBuffer) return input;
+    if(input instanceof Array) return this.audio.createAudioBuffer(input);
+    return null; // we'll have to call this.getAsAudioBuffer(input) in our components to allow loading from a url
+  }
+  createObject(device_id: string | null, key: string | null, initialValue: AudioBuffer|null, meta: BufferMetaData): IBuffer {
+    const obj = { audiobuffer: null, sig: signal(initialValue), meta };
+    this.setObj(device_id, key, obj);
+    return obj;
+  }
   async addDevice(device_id: string, device: RNBO.BaseDevice, patcher: RNBO.IPatcher, injector: Injector) {
     
     let refs = patcher.desc.externalDataRefs as BufferMetaData[];
@@ -49,17 +62,10 @@ export class RnboBufferService extends IRnboSignalService<AudioBuffer|null, IBuf
             // the buffer target is null, 
             // if file or url is not null, then the subject will be updated with the fetched buffer when it is loaded
             // else, the buffer will be released and the target will be updated with the device's default buffer on load
-
-            let obj = this.createObject(null, meta, file??url??null, true, false);
-            this.setObj(device_id, tag, obj);
-            let s = obj.input;
-            if(!s) throw new Error('buffer subject is null');
-            let subscriber = () => {
-              this.isLoading.next([device_id, id]);
-              this.setBuffer(device_id, device, id, s?.()??null).then(() => {
-                this.isLoading.next(null);
-              });
-            };
+            const initialValue = await this.getAsAudioBuffer(file??url??null);
+            const obj = this.createObject(device_id, id, initialValue, meta);
+            const sig = obj.sig;
+            this.createEffect(() => this.setBuffer(device_id, device, id, sig()), obj, injector);
         }
   }
 }
@@ -76,7 +82,7 @@ async setBuffer(device_id: string, device: RNBO.BaseDevice, buffer_id: string, b
   else {
     await device.setDataBuffer(buffer_id, value);
   }
-  this.setVal(device_id, buffer_id, value);
+  this.setData(device_id, buffer_id, value);
 }
 
   getAsBufferID(device_id: string, buffer_id: string|number): string {

@@ -100,7 +100,9 @@ export class WebAudioService {
     return buffer;
   }
   // add a function/optional arg to handle "true" insertion, i.e. disconnecting a previously connected in and out
-  addNode<T extends AudioNode>(id: string, node: T, connections?: ConnectionMap) {
+  addNode<T extends AudioNode>(id: string, node: T|null, connections?: ConnectionMap) {
+    if(!node) throw new Error(`node is null`);
+    
     try {
       this.nodes.set(id, node);
       if (!connections) {

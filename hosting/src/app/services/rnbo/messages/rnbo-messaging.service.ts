@@ -2,13 +2,16 @@ import {
   EffectRef,
   Injectable,
   Injector,
+  Signal,
   WritableSignal,
+  computed,
   effect,
   signal,
 } from '@angular/core';
 import * as RNBO from '@rnbo/js';
-import { IRnboObject, IRnboSignalService } from '../abstract_classes/signalService';
+import { IRnboObject } from '../abstract_classes/signalService';
 import { Subscription } from 'rxjs';
+
 
 type PortData = number[] | null;
 type PortMeta = any;
@@ -17,61 +20,80 @@ type Port = IRnboObject<PortData, PortMeta>;
 @Injectable({
   providedIn: 'root',
 })
-export class RnboMessagingService extends IRnboSignalService< PortData, Port > {
+export class RnboMessagingService {
   // device_id -> port_tag -> port_meta
-  deviceSubscriptions = new Map<string, RNBO.IEventSubscription>();
-  ctlSubscriptions = new Map<string, Map<string, Subscription>>();
-  map: Map<string, Map<string, Port>> = new Map();
-  constructor() {
-    super();
+  device!: Signal<RNBO.BaseDevice>;
+  // use these to create computed signals in consumer components
+  input = signal<[string, number[]]>(['', []]);
+  output = signal<[string, number[]]>(['', []]); 
+  inports = computed(() => [...this.device().inports.map((p) => p.tag)]);
+  outports = computed(() => [...this.device().outports.map((p) => p.tag)]);
+
+  inportMetadata = new Map<string, PortMeta>();
+  outportMetadata = new Map<string, PortMeta>();
+  // instead of a form control, we bind to the signal in our inport/outport components
+  inputEffect!: EffectRef;
+  outputSubscription!: RNBO.IEventSubscription;
+  constructor() { }
+parseOutputMessage(event: RNBO.MessageEvent) {
+  let { tag, payload } = event;
+  if(typeof tag === 'string' ) {
+    if(typeof payload === 'number') {
+      this.output.set([tag, [payload]]);
+    }
+    else if(Array.isArray(payload)) {
+      this.output.set([tag, payload]);
+    }
+    else {
+      this.output.set([tag, []]);
+    }
   }
-  parseInput(input: any): PortData | null {
-    let data = input?.split(' ').map((v: string) => Number(v)).filter((v: number) => !isNaN(v));
-    return data?.length ? data : null;
+}
+  deviceSubscription(device: RNBO.BaseDevice, debug = false) {
+    return device.messageEvent.subscribe((event: RNBO.MessageEvent) => {
+      if (debug) console.log('messageEvent', event);
+      this.parseOutputMessage(event);
+    });
   }
-  formatData(data: number[]): string {
-    return data?.join(' ') ?? '';
-  }
-  createObject(device_id: string | null, key: string | null, meta: PortMeta, initialValue: any): Port {
-    if(!device_id || !key) throw new Error('device_id or key is null');
-    if(this.map.get(device_id)?.has(key)) throw new Error(`port ${device_id}.${key} already exists`);
-    const obj = {meta, sig: signal(initialValue)};
-    this.setObj(device_id, key, obj);
-    return obj;  
-  }
-  addDevice(
-    device_id: string,
+  formatInputMessage(device: RNBO.BaseDevice) {
+      device.scheduleEvent(new RNBO.MessageEvent(0, ...this.input()));
+    }
+  link(
     device: RNBO.BaseDevice,
-    patcher: RNBO.IPatcher,
     injector: Injector,
     debug = false
   ) {
+    const { inports, outports } = device;
+    for(let { tag, meta } of inports) {
+          this.inportMetadata.set(tag, meta);
+    }
+    this.inputEffect = effect(() => this.formatInputMessage(device), {injector});
+    for(let { tag, meta } of outports) {
+          this.outportMetadata.set(tag, meta);
+    }
+    this.outputSubscription = this.deviceSubscription(device, debug);
+  }
+  destroy() {
+    this.inputEffect.destroy();
+    this.outputSubscription.unsubscribe();
+  }
+}
+/* 
+}
     const { inports, outports } = patcher.desc;
 
     for (let { tag, meta } of inports) {
-      const obj = this.createObject( device_id, tag, meta, meta?.initialValue ?? null);
+      const initialValue = meta?.initialValue ?? null;
+      const obj = this.createObject( device_id, tag, meta, initialValue);
       const sig = obj.sig;
-      this.createEffect(() => this.sendMessage(device, tag, sig?.()), obj, injector);
     }
-
       for (let { tag, meta } of outports) {
         this.createObject(device_id, tag, meta, meta?.initialValue ?? null);
     }
 
       this.unsubscribeFromDevice(device_id);
       this.deviceSubscriptions.set(device_id, this.subscribeToDevice(device_id, device, debug));
-  }
-  subscribeToDevice(device_id: string, device: RNBO.BaseDevice, debug = false) {
-    return device.messageEvent.subscribe((event: RNBO.MessageEvent) => {
-      if (debug) console.log('messageEvent', event);
-      let { tag, payload } = event;
-      let data = payload ? Array.isArray(payload) ? payload : [payload] : null;
-      this.setData(device_id, tag, data);
-    });
-  }
-  sendMessage(device: RNBO.BaseDevice, key: string, data: PortData) {
-    if (data !== null) {
-      device.scheduleEvent(new RNBO.MessageEvent(0, key, data));
-    }
-  }
-}
+ */
+  
+  
+
