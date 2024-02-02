@@ -1,16 +1,17 @@
-import { Injectable } from '@angular/core';
+import { EffectRef, Injectable, effect } from '@angular/core';
 import { RubixSceneService } from './rubix-scene/rubix-scene.service';
 import { RubixGameStateService } from './rubix-game-state/rubix-game-state.service';
 import { RubixRotationService } from './rubix-rotation/rubix-rotation.service';
 import { RubixPointerService } from './rubix-pointer/rubix-pointer.service';
 import { RubixCubeletStateService } from './rubix-cubelet-state/rubix-cubelet-state.service';
 import { RubixOrientationService } from './rubix-orientation/rubix-orientation.service';
-import { RnboMessagingService } from '../rnbo/messages/rnbo-messaging.service';
+import { getAllFaceColors } from './helpers/getFaceColors';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RubixService {
+  deviceConnection: EffectRef|null = null;
   // bound event handlers
   constructor( 
     public scene: RubixSceneService, 
@@ -19,7 +20,6 @@ export class RubixService {
     public pointer: RubixPointerService, 
     public cubelets: RubixCubeletStateService, 
     public orientation: RubixOrientationService,
-    public messaging: RnboMessagingService,
     ) { }
     afterViewInit(canvas: HTMLCanvasElement) {  
         this.scene.init(canvas, this.cubelets.names);
@@ -47,23 +47,6 @@ export class RubixService {
         this.game.moves.push(move);
       }
       }
-    }
-    connectDevice(device_id: string) {
-      const faceColorsSubject = this.messaging.getProp(device_id, 'faceColors', 'subject'); 
-      const moveInputSubject = this.messaging.getProp(device_id, 'moveInput', 'subject');
-
-        this.rotation.faceColors.subscribe((colors: number[]) => {
-          if(faceColorsSubject !== null) {
-            console.log('faceColorsSubject', colors.join(' '));
-            faceColorsSubject.next(colors.join(' '));
-          }      
-        });
-        this.rotation.moveInput.subscribe((move: number[]) => {
-          if(moveInputSubject !== null) {
-            console.log('moveInputSubject', move.join(' '));
-            moveInputSubject.next(move.join(' '));
-          }
-        });
     }
     render() {
           const animateFn = () => {

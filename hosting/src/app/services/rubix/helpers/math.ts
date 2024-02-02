@@ -22,15 +22,30 @@ export const randomAxis = (): Axis => (['x','y','z'] as Axis[])[Math.floor(Math.
 export const randomSlice = (): number => Math.floor(Math.random() * 3) - 1;
 
 
+// tranpose addrs
+
+    // 0 -> 2
+    // 1 -> 5
+    // 2 -> 8
+    // 3 -> 1
+    // 4 -> 4
+    // 5 -> 7
+    // 6 -> 0
+    // 7 -> 3
+    // 8 -> 6
+
+
 // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // 
  // Facelet Rotation Methods
 
     // for the "side" face, e.g. the face that doesn;t exchange any facelets with other faces
-
+export function flipSquare<El extends any>(sq: El[]): El[] {
+        let [a,b,c,d,e,f,g,h,i] = sq;
+        return [c,b,a,f,e,d,i,h,g];
+    }
 export function rotateSquare<El extends any>(sq: El[]): El[] {
-    let sqrt = Math.sqrt(sq.length);
-    if(sqrt % 1 !== 0)  throw Error(`input array ${sq} is not a perfect square`); /// IEEE 754 floating point math is exact for square roots of perfect squares
-    return sq.map((_, i) => sq[(i % sqrt + (i % sqrt) * sqrt)]);
+    let [a,b,c,d,e,f,g,h,i] = sq;
+    return [g,d,a,h,e,b,i,f,c];
 }
 export function rotateFace<Key extends string, El extends any>(tgt: Record<Key, El[]>, orientation: Orientation,  key?: Key) {
     if(key) {

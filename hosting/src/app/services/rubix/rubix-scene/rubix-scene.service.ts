@@ -4,7 +4,7 @@ import { COLOR_PALETTE } from '../helpers/data';
 import { createObjects } from '../helpers/three';
 import { Axis, Colors } from '../helpers/cubie';
 import { BehaviorSubject } from 'rxjs';
-import { RnboMessagingService } from '../../rnbo/messages/rnbo-messaging.service';
+import { flipSquare, rotateSquare } from '../helpers/math';
 @Injectable({
   providedIn: 'root'
 })
@@ -67,10 +67,11 @@ export class RubixSceneService {
       }
       return -1;
     }
-    getFaceColors(tgt: number[], orientation: [Axis,Axis,Axis], castTo: THREE.Vector3, castFrom: THREE.Vector3) {
-      tgt = [];
-      castFrom[orientation[0]] = 2;
-      castTo[orientation[0]] = -1;
+    getFaceColors(orientation: [Axis,Axis,Axis], castTo: THREE.Vector3, castFrom: THREE.Vector3) {
+      let colorIndices: number[] = [];
+      let isRight = orientation[0] === 'z';
+      castFrom[orientation[0]] = isRight? -2 :2;
+      castTo[orientation[0]] =  isRight?1:-1;
       castTo[orientation[1]] = 0;
       castTo[orientation[2]] = 0;
 
@@ -78,18 +79,36 @@ export class RubixSceneService {
         for(let j=0; j<3; j++) {
           castFrom[orientation[1]] = 1-i;
           castFrom[orientation[2]] = 1-j;
-          tgt.push(this.colorIndexFromRay(castFrom, castTo));
+          let index = this.colorIndexFromRay(castFrom, castTo);
+          colorIndices.push(index);
         }
       }
+      return colorIndices;
     }
     getAllFaceColors(tgt: Pick<Colors<number[]>, 'front'|'right'|'top'>) {
-      console.log(`getting all face colors`);
+      //console.log(`getting all face colors`);
+      //console.log(tgt);
       let castTo = new THREE.Vector3(0,0,0);
       let castFrom = new THREE.Vector3(0,0,0);
-      this.getFaceColors(tgt.front, ['x', 'y','z'], castTo, castFrom);
-      this.getFaceColors(tgt.right, ['z','y','x'], castTo, castFrom);
-      this.getFaceColors(tgt.top, ['y','x','z'], castTo, castFrom);
-      tgt.top.reverse();
-      return [...tgt.front, ...tgt.right, ...tgt.top];
+      
+      tgt.front = this.getFaceColors(['x', 'y','z'], castTo, castFrom);
+      tgt.top = flipSquare(this.getFaceColors(['y','x','z'], castTo, castFrom).reverse());
+      tgt.right = this.getFaceColors(['z','y','x'], castTo, castFrom);
+
+
+      console.log(`top: 
+      ${tgt.top.slice(0,3).join(' ')}
+      ${tgt.top.slice(3,6).join(' ')}
+      ${tgt.top.slice(6,9).join(' ')}`);
+
+      console.log(`right:
+      ${tgt.right.slice(0,3).join(' ')}
+      ${tgt.right.slice(3,6).join(' ')}
+      ${tgt.right.slice(6,9).join(' ')}`);
+      console.log(`front:
+      ${tgt.front.slice(0,3).join(' ')}
+      ${tgt.front.slice(3,6).join(' ')}
+      ${tgt.front.slice(6,9).join(' ')}`);
+      return Object.values(tgt).flat();
     }
 }

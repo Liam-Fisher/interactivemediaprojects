@@ -4,7 +4,6 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { VoiceFxComponent } from './pages/voice-fx/voice-fx.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -24,14 +23,15 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
-import { RnboModule } from './modules/rnbo/rnbo.module';
 import { RubixRoutingModule } from './modules/rubix/rubix-routing.module';
+import { CreateDevicePipe } from './pipes/create-device.pipe';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    NavigationComponent
+    NavigationComponent,
+    CreateDevicePipe
   ],
   imports: [
     RubixRoutingModule,
@@ -47,7 +47,6 @@ import { RubixRoutingModule } from './modules/rubix/rubix-routing.module';
     MatSidenavModule,
     MatIconModule,
     MatListModule,
-    RnboModule,
     // Firebase
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     //provideFunctions(() => getFunctions()),

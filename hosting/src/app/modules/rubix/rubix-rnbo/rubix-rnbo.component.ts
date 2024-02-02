@@ -1,23 +1,23 @@
-import { Component, ViewChild } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { RubixService } from 'src/app/services/rubix/rubix.service';
-import { RnboDeviceComponent } from '../../rnbo/rnbo-device/rnbo-device.component';
+import { Component, EventEmitter, Injector, Input, Output, effect, signal } from '@angular/core';
+import { RnboDeviceService } from 'src/app/services/rnbo/rnbo-device.service';
 
 @Component({
   selector: 'app-rubix-rnbo',
   template:`
-  <app-rnbo-device device_folder="rubix" (loadedEvent)="deviceLoaded($event)"></app-rnbo-device>
+  <p>{{this.path}}</p>
+  <p>{{this.rnbo.device_id()}}</p>
   `,
   styleUrls: ['./rubix-rnbo.component.scss']
 })
 export class RubixRnboComponent {
-    active_device_id = new BehaviorSubject<string|null>(null);
-    @ViewChild(RnboDeviceComponent) device!: RnboDeviceComponent;
-    constructor(public rubix: RubixService) { }
-    ngOnInit() {  }
-    ngAfterViewInit() { }
-    deviceLoaded(device_id: string) { 
-      this.active_device_id.next(device_id);
-      this.rubix.connectDevice(device_id);
-    }
+    @Input() path = 'rubix';
+    @Input() device_id = 'rubix_test';
+    @Output() loaded= new EventEmitter<void>();
+    constructor(public rnbo: RnboDeviceService, public injector: Injector) {}
+    ngOnInit() { }
+    ngAfterViewInit() {
+      this.rnbo.load(this.path, this.device_id, this.injector).then(() => {
+        this.loaded.emit();
+      });
+     }
 }

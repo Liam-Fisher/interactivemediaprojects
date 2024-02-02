@@ -4,8 +4,8 @@
     // 3. Parameter level
 // at the patch level we have access to the device namespace, and we can share Buffer resources between devices
         // Services: 
-            // RnboBufferService: create and access buffers
-            // RnboMessagingService: Send and receive messages 
+            // RnboBufferService: create and access buffers in a namespace shared between devices 
+            // RnboPatchingService: Route messages between devices 
         // Components:
             // RnboPatcherComponent? e.g. some interface for an indexed multidigraph, 
             // RnboBufferComponent? e.g. a waveform display for a buffer / input for urls / input for expressions
