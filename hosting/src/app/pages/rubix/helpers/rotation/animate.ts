@@ -7,6 +7,7 @@ export function animateRotation() {
         this.rotationProgress++;
         this.rotationGroup.rotateOnWorldAxis(this.rotationVector, this.rotationAngle);
         if (this.rotationProgress >= this.rotationFrames) {
+            this.rotationGroup.children.forEach((child: any) => this.scene.add(child));
             this.rotationProgress = 0;
             this.isRotating = false;
         }
