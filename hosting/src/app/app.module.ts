@@ -24,14 +24,13 @@ import { MatListModule } from '@angular/material/list';
 import { MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import { RubixRoutingModule } from './modules/rubix/rubix-routing.module';
-import { CreateDevicePipe } from './pipes/create-device.pipe';
+import { RubixModule } from './modules/rubix/rubix.module';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    NavigationComponent,
-    CreateDevicePipe
+    NavigationComponent
   ],
   imports: [
     RubixRoutingModule,
@@ -47,6 +46,7 @@ import { CreateDevicePipe } from './pipes/create-device.pipe';
     MatSidenavModule,
     MatIconModule,
     MatListModule,
+    RubixModule,
     // Firebase
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     //provideFunctions(() => getFunctions()),

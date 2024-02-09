@@ -25,6 +25,12 @@ import {  MatInputModule } from '@angular/material/input';
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule
+  ],
+  exports: [
+    RubixComponent,
+    RubixRnboComponent,
+    RubixDisplayComponent,
+    RubixRotationInputComponent
   ]
 })
 export class RubixModule { }

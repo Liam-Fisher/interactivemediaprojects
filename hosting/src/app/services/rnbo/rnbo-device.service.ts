@@ -14,8 +14,8 @@ import { BehaviorSubject } from 'rxjs';
 export class RnboDeviceService {
   device_id: IDSignal = signal('');
 
-  device: WritableDevice = signal(null);
-  patcher: WritablePatcher = signal(null);
+  device: RNBO.BaseDevice|null = null;
+  patcher: RNBO.IPatcher|null = null;
   
   input: WritableSignal<[string, number[]]> = signal(['', []]); 
   output: WritableSignal<[string, number[]]> = signal(['', []]);
@@ -44,22 +44,17 @@ async load(path: string|null, device_id: string|null, injector: Injector): Promi
         console.log(`loading device at ${path}/${device_id}`); 
       }
 
-      let context = this.audio.ctx;
-      let patcher = (await this.storage.loadPatcher(path, device_id));
-      let device = await RNBO.createDevice({ context, patcher });
-
+      this.patcher = (await this.storage.loadPatcher(path, device_id));
+      if(this.patcher) {
+        this.device = await RNBO.createDevice({ context: this.audio.ctx, patcher: this.patcher });
       if(this.debug) { 
-        console.log('------------------patcher------------------', patcher.desc);
-        console.log('~~~~~~~~~~~~~~~~~~presets~~~~~~~~~~~~~~~~~~', patcher.presets);
-        console.log('===================device==================', device);
+        console.log('------------------patcher------------------', this.patcher.desc);
+        console.log('~~~~~~~~~~~~~~~~~~presets~~~~~~~~~~~~~~~~~~', this.patcher.presets);
+        console.log('===================device==================', this.device);
       }
-
-    //  this.link(device_id, device, injector);
-
-      this.device.set(device);
-
-      this.inport.subscribe((msg: [string, number[]]) => this.device()?.scheduleEvent(this.createMessage(msg)));
-      this.device()?.messageEvent.subscribe((e: RNBO.MessageEvent) => this.setData(e));
+    }
+    //  this.inport.subscribe((msg: [string, number[]]) => this.device()?.scheduleEvent(this.createMessage(msg)));
+     // this.device()?.messageEvent.subscribe((e: RNBO.MessageEvent) => this.setData(e));
       
     }
       else {
@@ -72,6 +67,7 @@ async load(path: string|null, device_id: string|null, injector: Injector): Promi
   
   }
   createMessage(msg: Msg) {
+    console.log('createMessage', msg);
     return (new RNBO.MessageEvent(0, ...msg));
 }
 parse(data?: number|number[]): number[] {
@@ -92,15 +88,15 @@ subscribe<Evt extends any>(id: string, s: Subscribable<Evt>, Fn: (val: Evt, sig:
 link(id: string, device: RNBO.BaseDevice|null, injector: Injector) {
     this.reset();
     if(device!==null&&id) {
-    this.device.set(device);
+      this.device = device;
     // when the input signal changes, schedule the event
-    this.effect('debug', (msg: [string, number[]]) => console.log(`input ${msg} ${RNBO.TimeNow}`), injector);
-    this.effect(id, (msg: [string, number[]]) => this.device()?.scheduleEvent(this.createMessage(msg)), injector);
+      this.effect('debug', (msg: [string, number[]]) => console.log(`input ${msg} ${RNBO.TimeNow}`), injector);
+      this.effect(id, (msg: [string, number[]]) => this.device?.scheduleEvent(this.createMessage(msg)), injector);
     // when the device emits a message, update the output signal
     //device?.messageEvent.subscribe((e: RNBO.MessageEvent) => this.setData(e));
     //device?.messageEvent.subscribe((e: RNBO.MessageEvent) => console.log(`output ${e.tag} ${e.payload}`));
     this.subscribe(id, device?.messageEvent, (e: RNBO.MessageEvent) => this.setData(e), 'output');
-   this.subscribe('debug', device?.messageEvent, (e: RNBO.MessageEvent) => console.log(`${e.tag}: ${e.payload} ${e.time}`), 'output');
+    this.subscribe('debug', device?.messageEvent, (e: RNBO.MessageEvent) => console.log(`${e.tag}: ${e.payload} ${e.time}`), 'output');
   }
 }
   reset() {

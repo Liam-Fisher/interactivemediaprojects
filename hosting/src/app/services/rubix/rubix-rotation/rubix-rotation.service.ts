@@ -5,8 +5,7 @@ import * as THREE from 'three';
 import { RubixSceneService } from '../rubix-scene/rubix-scene.service';
 import { FACELET_ROTATION_SLICES, RING_FACES } from '../helpers/data';
 import { RnboDeviceService } from '../../rnbo/rnbo-device.service';
-import { removeGroup } from '../helpers/three/groups';
-import { createGroup } from '../helpers/cubie';
+import { createGroup, removeGroup } from '../helpers/three/groups';
 
 // use the normals to determine the axis of rotation
 @Injectable({

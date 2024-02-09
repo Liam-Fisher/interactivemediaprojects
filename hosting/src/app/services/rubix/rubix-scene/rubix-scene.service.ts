@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import * as THREE from 'three';
 import { COLOR_PALETTE } from '../helpers/data';
 import { createObjects } from '../helpers/three';
-import { Axis, Colors } from '../helpers/cubie';
 import { BehaviorSubject } from 'rxjs';
 import { flipSquare, rotateSquare } from '../helpers/math';
+import { Axis, Colors } from 'src/app/types/rubix';
 @Injectable({
   providedIn: 'root'
 })
