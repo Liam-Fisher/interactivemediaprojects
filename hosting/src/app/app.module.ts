@@ -12,7 +12,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 // Firebase Components
 import { initializeApp,provideFirebaseApp } from '@angular/fire/app';
-import { provideFunctions,getFunctions } from '@angular/fire/functions';
 import { provideStorage,getStorage } from '@angular/fire/storage';
 import { environment } from '../environments/environment';
 import { NavigationComponent } from './navigation/navigation.component';

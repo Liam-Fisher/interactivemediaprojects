@@ -35,6 +35,24 @@ export class RnboDeviceService {
     private ngZone: NgZone
 
   ) { }
+  get inputs() {
+    if(this.device) {
+      return this.device.inports;
+    }
+    return [];
+  }
+  get outputs() {
+    if(this.device) {
+      return this.device.outports;
+    }
+    return [];
+  }
+  set msg(msg: [string, string]) {
+    let data = msg[1].split(' ').map((s: string) => parseInt(s)).filter((n: number) => !isNaN(n));
+    if(data.length) {
+      this.input.set([msg[0], data]);
+    }
+  }
 async load(path: string|null, device_id: string|null, injector: Injector): Promise<void> {
   try {
     if (path && device_id) { 

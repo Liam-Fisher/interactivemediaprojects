@@ -6,11 +6,7 @@ import { BehaviorSubject } from 'rxjs';
 @Component({
   selector: 'app-root',
   template: `
-  <button (click)="load()">Load Rubix</button>
-  @if(isLoaded|async){
-    <app-rubix></app-rubix>
-  }
-  `,
+  <router-outlet></router-outlet>`,
   styles: [`
     :host {
       display: flex;
