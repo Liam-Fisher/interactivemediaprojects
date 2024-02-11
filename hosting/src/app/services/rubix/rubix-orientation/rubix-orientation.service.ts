@@ -54,19 +54,19 @@ export class RubixOrientationService {
     return SLICE_REORIENTATION[axis].map(letters => letters.map(letter => this.sliceCodes.indexOf(letter)));
   }
   reorient(axis: Axis) {
- console.log(`reorienting cube ${axis}`);
+// console.log(`reorienting cube ${axis}`);
     //this.cubeCodes.forEach((letter, i) => console.log(`${i}: ${letter}`));
    permute(this.cubeCodes, this.getCubeIndexCycle(axis));
 
-  console.log(`reoriented cube ${axis}`);
+ // console.log(`reoriented cube ${axis}`);
     //this.cubeCodes.forEach((letter, i) => console.log(`${i}: ${letter}`));
 
    // console.log(`reorienting slices ${axis}`);
    // console.log(this.sliceCodes.map((letter, i) => `${i}: ${letter}`).join(' '));
     //this.sliceCodes.forEach((letter, i) => console.log(`${i}: ${letter}`));
  permuteGroup(this.sliceCodes, '+', this.getSliceIndexCycle(axis));
- console.log(`reoriented slices ${axis}`);
- console.log(this.sliceCodes.map((letter, i) => `${i}: ${letter}`).join(' '));
+// console.log(`reoriented slices ${axis}`);
+// console.log(this.sliceCodes.map((letter, i) => `${i}: ${letter}`).join(' '));
  //this.sliceCodes.forEach((letter, i) => console.log(`${i}: ${letter}`));
   }
   getAction(letter: string): RotationAction {
@@ -75,19 +75,19 @@ export class RubixOrientationService {
 
 
     if(index>=0) {
-      console.log(`input: ${index}`);
+     // console.log(`input: ${index}`);
       let reorientedLetter = CUBE_ROTATION_CODES[index];
       orientation = index>2 ? '-' : '+';
       axis = reorientedLetter.toLowerCase() as Axis;
       // ignoring this for now
       // this.reorient(letter as Axis);
       // so, we set the axis to the first element of the cycle
-      console.log(`(cube) axis: ${axis}, orientation: ${orientation}`);
+      //console.log(`(cube) axis: ${axis}, orientation: ${orientation}`);
       return {axis, orientation};
     }
     index = this.sliceCodes.indexOf(letter);
     if(index>=0) {
-      console.log(`index: ${index}`);
+      //console.log(`index: ${index}`);
       let reorientedLetter = SLICE_ROTATION_CODES[index];
       let reorientedIndex =  this.sliceCodes.indexOf(reorientedLetter);
       //console.log(`reoriented letter: ${reorientedLetter}`);
@@ -97,10 +97,10 @@ export class RubixOrientationService {
       orientation =  index<9 ? '-' : '+';
       axis = CUBE_ROTATION_CODES[Math.floor((index%9)/3)+3] as Axis;
 
-      console.log(`(slice) axis: ${axis}, ${slice}, orientation: ${orientation}`);
+    //  console.log(`(slice) axis: ${axis}, ${slice}, orientation: ${orientation}`);
       return {axis, orientation, slice};
     }
-    console.log(`invalid letter code ${letter}`);
+   // console.log(`invalid letter code ${letter}`);
     return {};
   }
 }

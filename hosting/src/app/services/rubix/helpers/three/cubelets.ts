@@ -1,9 +1,7 @@
 
 import * as THREE from 'three';
-import { GUI } from 'lil-gui';
 import { addressToPosition, positionToColors } from "src/app/services/rubix/helpers/converting";
 import AxisGridHelper from "src/app/services/rubix/helpers/axisGridHelper";
-const gui = new GUI();
 
 export function addShell(scene: THREE.Scene, size: number) {
     let shellMaterial = new THREE.MeshStandardMaterial( {color: 0xFAAAFA, transparent: true, opacity: 0.1} );
@@ -46,5 +44,5 @@ function createCubeMesh(name: string, position: [number,number,number], size: nu
 }
 function createHelper(mesh: THREE.Mesh, name: string) {
     const helper = new AxisGridHelper(mesh, 1);
-    gui.add(helper, 'visible').name(name);
+    //gui.add(helper, 'visible').name(name);
 }

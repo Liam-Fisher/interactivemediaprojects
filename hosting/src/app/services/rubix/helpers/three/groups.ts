@@ -1,6 +1,6 @@
 import * as THREE from 'three'; 
 export function createGroup(scene: THREE.Scene, names: string[]) {
-    console.log(`creating group with names ${names.join('|')}`);
+    //console.log(`creating group with names ${names.join('|')}`);
   let group = new THREE.Group();
     for (let name of names) {
       let object = scene.getObjectByName(name);

@@ -19,7 +19,7 @@ export class RubixRotationService {
   vector = new THREE.Vector3(1, 0, 0);
   group: THREE.Group = new THREE.Group();
   constructor(
-    public device: RnboDeviceService,
+    public rnbo: RnboDeviceService,
     private scene: RubixSceneService,
     private cubelets: RubixCubeletStateService
   ) {}
@@ -37,10 +37,8 @@ export class RubixRotationService {
     removeGroup(this.scene.scene, this.cubelets.rotated, this.group);
     this.isCubeRotating = false;
     let faceColorArray = this.scene.getAllFaceColors(this.cubelets.faceColors);
-    console.log(
-      `rotation complete, emitting faceColors: ${faceColorArray.join(' ')}`
-    );
-    this.device.inport.next(['faceColors', faceColorArray]);
+    //console.log(`rotation complete, emitting faceColors: ${faceColorArray.join(' ')}`);
+    this.rnbo.inport.next(['faceColors', faceColorArray]);
   }
   initializeRotation(
     axis: Axis,
@@ -48,7 +46,7 @@ export class RubixRotationService {
     slice: number,
     state: string
   ) {
-    console.log('initializing SliceRotation');
+ //   console.log('initializing SliceRotation');
     this.frames =
       state === 'scrambling'
         ? this.scene.framesPerScrambleRotation
@@ -59,13 +57,8 @@ export class RubixRotationService {
     this.group = createGroup(this.scene.scene, this.cubelets.rotated);
     if (state !== 'scrambling') {
       let move = this.getMoveAsIntList(axis, orientation, slice);
-      console.log(
-        `rotation starting, emitting move: ${axis} ${orientation} ${slice} | ${move.join(
-          ' '
-        )}`
-      );
-
-      this.device.inport.next(['moveInput', move]);
+      //console.log(`rotation starting, emitting move: ${axis} ${orientation} ${slice} | ${move.join(' ')}`);
+      this.rnbo.inport.next(['moveInput', move]);
     }
     this.isCubeRotating = true;
   }

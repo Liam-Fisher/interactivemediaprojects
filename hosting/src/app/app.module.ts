@@ -14,7 +14,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { initializeApp,provideFirebaseApp } from '@angular/fire/app';
 import { provideStorage,getStorage } from '@angular/fire/storage';
 import { environment } from '../environments/environment';
-import { NavigationComponent } from './navigation/navigation.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -23,13 +22,11 @@ import { MatListModule } from '@angular/material/list';
 import { MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import { RubixRoutingModule } from './modules/rubix/rubix-routing.module';
-import { RubixModule } from './modules/rubix/rubix.module';
 
 
 @NgModule({
   declarations: [
-    AppComponent,
-    NavigationComponent
+    AppComponent
   ],
   imports: [
     RubixRoutingModule,
@@ -45,7 +42,6 @@ import { RubixModule } from './modules/rubix/rubix.module';
     MatSidenavModule,
     MatIconModule,
     MatListModule,
-    RubixModule,
     // Firebase
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     //provideFunctions(() => getFunctions()),

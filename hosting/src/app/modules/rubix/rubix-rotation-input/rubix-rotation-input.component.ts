@@ -12,9 +12,15 @@ import { RubixService } from 'src/app/services/rubix/rubix.service';
  @Component({
   selector: 'app-rubix-rotation-input',
   template: `
-  <button mat-icon-button class="scramble-button" color="primary" aria-label="Example icon button with a home icon" (click)="restart()">
-  restart
+  <div class="ctl-buttons">
+  <button mat-raised-button class="scramble-button" color="primary" aria-label="Example icon button with a home icon" (click)="restart()">
+  scramble
     </button>
+  
+    <button mat-raised-button class="scramble-button" color="primary" aria-label="Example icon button with a home icon" (click)="reset.emit()">
+  reset
+    </button>
+  </div>
   <div class="ui-container" style="display: grid; grid-template-rows: repeat(3, 1fr); grid-template-columns: repeat(6, 1fr);">
   <div class="button-container" *ngFor="let name of rotationLetters">
     <button mat-fab color="primary" aria-label="Example icon button with a home icon" (click)="onClick(name)">
@@ -25,14 +31,12 @@ import { RubixService } from 'src/app/services/rubix/rubix.service';
   `,
   styles: [
     `
-    .scramble-button {
-      position: absolute;
-      top: 1000px;
-      left: 0;
-    }
-    .ui-container {
-      position: absolute;
-      top: 1100px;
+    .ctl-buttons {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
     }
     `
   ]})
@@ -47,12 +51,12 @@ export class RubixRotationInputComponent {
   orientation = "+";
   slice = "0";
   rotationCode = new FormControl<string|null>(null);
+  @Output() reset: EventEmitter<void> = new EventEmitter();
   @Output() cubeRotationAction: EventEmitter<string> = new EventEmitter();
   @Output() rotationActionEvent: EventEmitter<[string, string, number|undefined]> = new EventEmitter();
   constructor(public rubix: RubixService) { }
   @HostListener('window:keydown', ['$event'])
   keyEvent(event: KeyboardEvent) {
-    console.log(`key event: ${event.key}`);
     if (this.rotationLetters.includes(event.key)) {
       this.letterInput(event.key);
     }

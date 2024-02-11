@@ -41,11 +41,11 @@ export class RubixFaceletStateService {
     rotate(axis: Axis, orientation: Orientation, slice: number) {
 
         let sideFace = SIDE_FACES[axis][slice+1];
-        console.log(`rotating side: ${sideFace??'none'}`);
+       // console.log(`rotating side: ${sideFace??'none'}`);
         rotateFace(this.colors, orientation, sideFace);
 
         let ringFaces = RING_FACES[axis][orientation];
         rotateSlice(this.colors, this.getSlices(axis, ringFaces, slice));   
-        this.printFaces();
+     //   this.printFaces();
     }
 }

@@ -1,11 +1,10 @@
-import { EffectRef, Injectable, effect } from '@angular/core';
+import { EffectRef, Injectable } from '@angular/core';
 import { RubixSceneService } from './rubix-scene/rubix-scene.service';
 import { RubixGameStateService } from './rubix-game-state/rubix-game-state.service';
 import { RubixRotationService } from './rubix-rotation/rubix-rotation.service';
 import { RubixPointerService } from './rubix-pointer/rubix-pointer.service';
 import { RubixCubeletStateService } from './rubix-cubelet-state/rubix-cubelet-state.service';
 import { RubixOrientationService } from './rubix-orientation/rubix-orientation.service';
-import { getAllFaceColors } from './helpers/getFaceColors';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +20,7 @@ export class RubixService {
     public cubelets: RubixCubeletStateService, 
     public orientation: RubixOrientationService,
     ) { }
-    afterViewInit(canvas: HTMLCanvasElement) {  
+    init(canvas: HTMLCanvasElement) {  
         this.scene.init(canvas, this.cubelets.names);
         this.orientation.reset();
     }

@@ -9,7 +9,7 @@ export function reorientCycle<El extends any>(cycle: El[], orientation: Orientat
 
 
 export function permuteGroup(names: string[], orientation: Orientation, cycles: number[][]): string[][] {
-    cycles.forEach(cycle => console.log(`rotating: ${cycle.map(c => names[c]).join('|')}`));
+ //   cycles.forEach(cycle => console.log(`rotating: ${cycle.map(c => names[c]).join('|')}`));
     return cycles.map(cycle => permute(names, reorientCycle(cycle, orientation)));
 }
 

@@ -9,11 +9,8 @@ import { RubixService } from 'src/app/services/rubix/rubix.service';
   styles: [
     `
     .three-game-canvas {
-      width: 1000px;
-      height: 1000px;
-      position: absolute;
-      top: 0;
-      left: 0;  
+      width: min(100%, 1000px);
+      aspect-ratio: 1/1; 
     }
     `
   ]
@@ -27,10 +24,14 @@ export class RubixDisplayComponent {
     constructor(public ngZone: NgZone, public rubix: RubixService) { }
       ngAfterViewInit() {
         const canvas = this.display.nativeElement;
-        this.rubix.afterViewInit(canvas);
+        this.reset();
         this.ngZone.runOutsideAngular(() => {
           this.rubix.addListeners(canvas);
           this.rubix.render();
         });
+      }
+      reset() {
+        const canvas = this.display.nativeElement;
+        this.rubix.init(canvas);
       }
 }
