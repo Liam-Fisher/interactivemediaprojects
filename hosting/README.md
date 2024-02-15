@@ -1,27 +1,43 @@
 # InteractiveMediaProjects
+check it out [here](interactive-media-projects.web.app)
+## RUBIX
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.2.0.
+A rubix cube rendered with threejs whose state is sent to a WASM compiled/designed using [rnbo](http://www.rnbo.cycling.com).
+Clicking the "Load Audio" button will load the "device" (the WASM) from a cloud storage bucket and begin emitting audio.
+The "letter" buttons allow rotating different slices of the cube by click or key input:
+ - F
+ -
+### Under The Hood
+Three messaging channels are used between the ui, the cube state, and the wasm audio node:
+ 1. Face Colors: Visible Facelets (From Cube State Services) -> Notes of the active chord
+ 2. Move Input: Button UI () -> Playback Rhythm && Cube Animation
+ 3. Light Positions: Note Event (from WASM) -> Animated Positions of the Lights in the threejs scene.
 
-## Development server
+The audio WASM cycles between a preset sequence of 6 note chords. 
+Each of the 6 possible face colors are mapped to an index corresponding to the nth note of the current chord. 
+Notes are played at 480 BPM (or 8 notes per second).
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+The internal state of the WASM includes the current and previous position for each light (front, left and top), and changes to a new position adjacent to the current one, moving "forward", so that repeated oscillation of states is not possible.
 
-## Code scaffolding
+When this state changes (8 times per second), a set of parameters (amplitude and panning) for each harmonic (1st, 4th and 10th) is retrieved from a buffer, alongside a set of coefficients for the resonator. 
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+The amplitude and panning are static, (although they are accessible from the WASM interface).
+These coefficients are recalculated every state change, and the most recent cube state is retrieved before each note. 
 
-## Build
+When a note is played, a position animation is triggered from within the WASM device (i wanted to try out the easing function), that changes a pair of parameters (front, left, top) from the previous position to the new one. 
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+These are used to control the positions of the lights in the threejs scene.
 
-## Running unit tests
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Personal Notes
 
-## Running end-to-end tests
+This project was mostly based around experimenting with the potential of using RNBO/ThreeJS for the audio and visuals in an interactive media project. I'm pretty happy with the results, but did run into some issues with latency...
+If you are interested in creating similar projects (which I highly encourage), here are some of my findings:
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+### Connecting Message streams
+I used an RXJS Behavior Subject to handle the "inport" and "outport" messages from the RNBO device. This was probably the easiest to set up but incurred the most latency (for example, there is an audible delay for the move input effect).
+I'd recommend using these for state changes 
+For two-way parameter control uis, (which were used for debugging purposes), I used Angular Signals, which had a tendency to settle at appropriate control rate for RNBO parameters.
+Parameters controlling animations were subscribed to separately, and tended to update at frame rate or higher.
+### Audio Latency
+the audio latency was negligible with the emitted parameter events (e.g. the light animations) until around 40 BPM, where the light animation was visibly delayed from the note onset. As parameter change events are extremely responsive, a more "precise" audio -> visual correspondence at low event rates could be achieved by retrieving the latency from the audio context at runtime, assigning it to an rnbo parameter, and delaying the parameter change from within the device by this amount. 
