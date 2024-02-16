@@ -13,18 +13,21 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 // Firebase Components
 import { initializeApp,provideFirebaseApp } from '@angular/fire/app';
-import { provideFunctions,getFunctions } from '@angular/fire/functions';
 import { provideStorage,getStorage } from '@angular/fire/storage';
 import { environment } from '../environments/environment';
-import { RubixRotationInputComponent } from './pages/rubix-rotation-input/rubix-rotation-input.component';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
+import { MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import { RubixRoutingModule } from './modules/rubix/rubix-routing.module';
 
 
 @NgModule({
   declarations: [
-    AppComponent,
-    VoiceFxComponent,
-    RubixComponent,
-    RubixRotationInputComponent
+    AppComponent
   ],
   imports: [
     BrowserModule,
