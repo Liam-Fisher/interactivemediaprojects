@@ -6,7 +6,7 @@ A rubix cube rendered with threejs whose state is sent to a WASM compiled/design
 Clicking the "Load Audio" button will load the "device" (the WASM) from a cloud storage bucket and begin emitting audio.
 The "letter" buttons allow rotating different slices of the cube by click or key input:
  - F
- -
+ - 
 ### Under The Hood
 Three messaging channels are used between the ui, the cube state, and the wasm audio node:
  1. Face Colors: Visible Facelets (From Cube State Services) -> Notes of the active chord
